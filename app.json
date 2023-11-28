@@ -1,0 +1,61 @@
+{
+  "expo": {
+    "name": "HanaHanaDailyLife",
+    "slug": "HanaHanaDailyLife",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/img/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/img/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "permissions": [        
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION"
+      ],
+      "services": [
+        {
+          "name": "LOCATION_TRACKING_TASK",
+          "taskName": "location-tracking-task",
+          "taskType": "headless"
+        }
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/img/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyC-2mF5-0Bfn23wH7GGj9OQOKpGAIG6avI"
+        }
+      },
+      "package": "com.rdkg.HanaHanaDailyLifeApp"
+    },
+    "web": {
+      "favicon": "./assets/img/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "9202e9c7-cc18-4529-889c-d156068e4a1a"
+      }
+    }
+  },
+  "plugins": [
+    [
+      "expo-location",
+      {
+        "isAndroidBackgroundLocationEnabled": "Allow $(PRODUCT_NAME) to use your location."
+      }
+    ]
+  ]
+}
