@@ -24,6 +24,7 @@ const Tab = createBottomTabNavigator();
 
 const db = openDB('HanaHanaDailyLife.db');
 const dbService = new DatabaseService(db);
+
 // dbService.dropTableData('event')
 // dbService.dropTableData('category')
 // dbService.dropTableData('activity')
