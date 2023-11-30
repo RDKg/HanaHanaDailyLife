@@ -206,6 +206,7 @@ export const EventEditorScreen = ({navigation, route}) => {
     const prevScreenName = route.params?.prevScreenName;
     const eventData = route?.params?.data;
     const currentDate = new Date();
+    const datePlusMinute = new Date(currentDate.getTime() + 60 * 1000);
 
     const [data, setData] = useState({});
     const [currentActivitiesData, setCurrentActivitiesData] = useState();
@@ -236,8 +237,8 @@ export const EventEditorScreen = ({navigation, route}) => {
     const [description, setDescription] = useState();
     const [budget, setBudget] = useState(0);
 
-    const [startDate, setStartDate] = useState(currentDate);
-    const [endDate, setEndDate] = useState(currentDate);
+    const [startDate, setStartDate] = useState(datePlusMinute);
+    const [endDate, setEndDate] = useState(datePlusMinute);
 
     const [validationErrors, setValidationErrors] = useState({});
     
@@ -1113,4 +1114,4 @@ export const EventDetailsScreen = ({navigation, route}) => {
             </SafeAreaView>
         </View>
     );
-} 
+}
