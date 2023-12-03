@@ -10,9 +10,8 @@ import * as utils from '../utils.js';
 import { styles } from '../styles/styles.js'; 
 
 import { AboutScreen } from './AboutScreen.js';
-import { EventTabNavigator } from './EventsScreen.js';
+import { TaskTabNavigator } from './TasksScreen.js';
 import { MessengerScreen } from './MessengerScreen.js';
-import { NotificationsScreen } from './NotificationsScreen.js'; 
 import { ProfileTabNavigator } from './ProfileScreen.js';
 import { SettingsScreen } from './SettingsScreen.js';
 import { StatsScreen } from './StatsScreen.js';
@@ -39,10 +38,9 @@ export const HomeTabNavigator = () => {
             <Stack.Screen name='Profile' component={ProfileTabNavigator}/>
             <Stack.Screen name='Settings' component={SettingsScreen}/>
             <Stack.Screen name='Messenger' component={MessengerScreen}/>
-            <Stack.Screen name='Events' component={EventTabNavigator} initialParams={{withGoBack: true}}/>
+            <Stack.Screen name='Tasks' component={TaskTabNavigator} initialParams={{withGoBack: true}}/>
             <Stack.Screen name='Stats' component={StatsScreen}/>
             <Stack.Screen name='Users' component={UsersScreen}/>
-            <Stack.Screen name='Notifications' component={NotificationsScreen}/>
             <Stack.Screen name='About' component={AboutScreen}/>
         </Stack.Navigator>
     )
@@ -170,7 +168,7 @@ export const HomeScreen = ({navigation}) => {
                 </View>
                 <View style={{gap: constants.margin}}>
                     <TouchableHighlight 
-                        onPress={() => navigation.navigate('Events', {withGoBack: true})} 
+                        onPress={() => navigation.navigate('Tasks', {withGoBack: true})} 
                         underlayColor={utils.convertColorDataToString(constants.grayColor)}
                         style={{
                             ...styles.defaultBox, 
@@ -202,17 +200,6 @@ export const HomeScreen = ({navigation}) => {
                         }
                     }>
                         <Text style={styles.defaultTextButton}>ПОЛЬЗОВАТЕЛИ</Text>
-                    </TouchableHighlight>
-                    <TouchableHighlight 
-                        onPress={() => navigation.navigate('Notifications', {withGoBack: true})} 
-                        underlayColor={utils.convertColorDataToString(constants.grayColor)}
-                        style={{
-                            ...styles.defaultBox, 
-                            ...styles.dropShadow, 
-                            padding: constants.padding,
-                        }
-                    }>
-                        <Text style={styles.defaultTextButton}>УВЕДОМЛЕНИЯ</Text>
                     </TouchableHighlight>
                     <TouchableHighlight 
                         onPress={() => navigation.navigate('About', {withGoBack: true})} 

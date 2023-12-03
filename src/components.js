@@ -118,10 +118,10 @@ export const GoBackButton = ({onPress, withGoBack}) => {
     return null;
 }
 
-export const EventButton = ({
+export const TaskButton = ({
     onPress=null, 
     underlayColor=utils.convertColorDataToString(constants.grayColor),
-    AvatarComponent=constants.avatars.anotherEventAvatar, 
+    AvatarComponent=constants.avatars.anotherTaskAvatar, 
     title=null, 
     description=null,
 }) => {
@@ -172,13 +172,13 @@ export const EventButton = ({
     );
 }
 
-export const EventsButtons = ({
+export const TasksButtons = ({
     data,
     currentScreenName,
     navigation
 }) => {
     const currentDate = new Date();
-    const eventsButtons = data.map((mainData) => {
+    const tasksButtons = data.map((mainData) => {
         const titleComponent = <Text key={uuidv4()} style={styles.screenTitleText}>{mainData.title}</Text>;
         const buttonsComponents = mainData.data.map((item) => {
             const startDate = new Date(item.started_at);
@@ -198,14 +198,14 @@ export const EventsButtons = ({
                 timeRemaining = utils.convertDateToStringFormat(endDate, {});
             }
 
-            const eventButton = (
-                <EventButton
+            const taskButton = (
+                <TaskButton
                     key={uuidv4()}
                     AvatarComponent={constants.avatars[item.avatar]}
                     description={item.description}
                     title={item.title}
                     onPress={() => {navigation.navigate(
-                            currentDate >= startDate ? 'EventDetails' : 'EventEditor', 
+                            currentDate >= startDate ? 'TaskDetails' : 'TaskEditor', 
                             {
                                 withGoBack: true, 
                                 data: item, 
@@ -229,10 +229,10 @@ export const EventsButtons = ({
                                 ...styles.gradientBorder,
                             }}
                         >
-                            {eventButton}
+                            {taskButton}
                         </LinearGradient> :
                         <Fragment key={uuidv4()}>
-                            {eventButton}
+                            {taskButton}
                         </Fragment>
                     }
                     <Text 
@@ -270,10 +270,10 @@ export const EventsButtons = ({
         );
     });
 
-    return eventsButtons;
+    return tasksButtons;
 }
 
-export const FlatListEventsButtons = (props) => {
+export const FlatListTasksButtons = (props) => {
     const currentDate = new Date();
     const {    
         data,
@@ -325,13 +325,13 @@ export const FlatListEventsButtons = (props) => {
                                 timeRemaining = utils.convertDateToStringFormat(endDate, {});
                             }
 
-                            const eventButton = (
-                                <EventButton 
+                            const taskButton = (
+                                <TaskButton 
                                     AvatarComponent={constants.avatars[subItem.avatar]} 
                                     description={subItem.description} 
                                     title={subItem.title}
                                     onPress={() => {navigation.navigate(
-                                            currentDate >= startDate ? 'EventDetails' : 'EventEditor', 
+                                            currentDate >= startDate ? 'TaskDetails' : 'TaskEditor', 
                                             {
                                                 withGoBack: true, 
                                                 data: subItem, 
@@ -354,10 +354,10 @@ export const FlatListEventsButtons = (props) => {
                                                 ...styles.gradientBorder,
                                             }}
                                         >
-                                            {eventButton}
+                                            {taskButton}
                                         </LinearGradient> :
                                         <Fragment>
-                                            {eventButton}
+                                            {taskButton}
                                         </Fragment>
                                     }
                                     <Text 

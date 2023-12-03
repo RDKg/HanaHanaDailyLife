@@ -1,22 +1,22 @@
-import adventureEventAvatar from '../../assets/ico/events/adventure-event-avatar.svg';
-import anotherEventAvatar from '../../assets/ico/events/another-event-avatar.svg';
-import cleanEventAvatar from '../../assets/ico/events/clean-event-avatar.svg';
-import foodEventAvatar from '../../assets/ico/events/food-event-avatar.svg';
-import geoEventAvatar from '../../assets/ico/events/geo-event-avatar.svg';
-import healthEventAvatar from '../../assets/ico/events/health-event-avatar.svg';
-import hygieneEventAvatar from '../../assets/ico/events/hygiene-event-avatar.svg';
-import inviteEventAvatar from '../../assets/ico/events/invite-event-avatar.svg';
-import meetingEventAvatar from '../../assets/ico/events/meeting-event-avatar.svg';
-import petEventAvatar from '../../assets/ico/events/pet-event-avatar.svg';
-import relaxEventAvatar from '../../assets/ico/events/relax-event-avatar.svg';
-import shopEventAvatar from '../../assets/ico/events/shop-event-avatar.svg';
-import sleepEventAvatar from '../../assets/ico/events/sleep-event-avatar.svg';
-import sportEventAvatar from '../../assets/ico/events/sport-event-avatar.svg';
-import studyEventAvatar from '../../assets/ico/events/study-event-avatar.svg';
-import taskEventAvatar from '../../assets/ico/events/task-event-avatar.svg';
-import walkEventAvatar from '../../assets/ico/events/walk-event-avatar.svg';
-import workEventAvatar from '../../assets/ico/events/work-event-avatar.svg';
-import PlusEventAvatar from '../../assets/ico/events/add-event-avatar.svg'
+import adventureTaskAvatar from '../../assets/ico/tasks/adventure-task-avatar.svg';
+import anotherTaskAvatar from '../../assets/ico/tasks/another-task-avatar.svg';
+import cleanTaskAvatar from '../../assets/ico/tasks/clean-task-avatar.svg';
+import foodTaskAvatar from '../../assets/ico/tasks/food-task-avatar.svg';
+import geoTaskAvatar from '../../assets/ico/tasks/geo-task-avatar.svg';
+import healthTaskAvatar from '../../assets/ico/tasks/health-task-avatar.svg';
+import hygieneTaskAvatar from '../../assets/ico/tasks/hygiene-task-avatar.svg';
+import inviteTaskAvatar from '../../assets/ico/tasks/invite-task-avatar.svg';
+import meetingTaskAvatar from '../../assets/ico/tasks/meeting-task-avatar.svg';
+import petTaskAvatar from '../../assets/ico/tasks/pet-task-avatar.svg';
+import relaxTaskAvatar from '../../assets/ico/tasks/relax-task-avatar.svg';
+import shopTaskAvatar from '../../assets/ico/tasks/shop-task-avatar.svg';
+import sleepTaskAvatar from '../../assets/ico/tasks/sleep-task-avatar.svg';
+import sportTaskAvatar from '../../assets/ico/tasks/sport-task-avatar.svg';
+import studyTaskAvatar from '../../assets/ico/tasks/study-task-avatar.svg';
+import taskTaskAvatar from '../../assets/ico/tasks/task-task-avatar.svg';
+import walkTaskAvatar from '../../assets/ico/tasks/walk-task-avatar.svg';
+import workTaskAvatar from '../../assets/ico/tasks/work-task-avatar.svg';
+import PlusTaskAvatar from '../../assets/ico/tasks/add-task-avatar.svg'
 
 export const fontFiles = {
     RalewayThin: require('../../assets/fonts/Raleway-Thin.ttf'),
@@ -31,81 +31,81 @@ export const fontFiles = {
 };
 
 export const avatars = {
-    adventureEventAvatar,
-    anotherEventAvatar,
-    cleanEventAvatar,
-    foodEventAvatar,
-    geoEventAvatar,
-    healthEventAvatar,
-    hygieneEventAvatar,
-    inviteEventAvatar,
-    meetingEventAvatar,
-    petEventAvatar,
-    relaxEventAvatar,
-    shopEventAvatar,
-    sleepEventAvatar,
-    sportEventAvatar,
-    studyEventAvatar,
-    taskEventAvatar,
-    walkEventAvatar,
-    workEventAvatar,
-    PlusEventAvatar,
+    adventureTaskAvatar,
+    anotherTaskAvatar,
+    cleanTaskAvatar,
+    foodTaskAvatar,
+    geoTaskAvatar,
+    healthTaskAvatar,
+    hygieneTaskAvatar,
+    inviteTaskAvatar,
+    meetingTaskAvatar,
+    petTaskAvatar,
+    relaxTaskAvatar,
+    shopTaskAvatar,
+    sleepTaskAvatar,
+    sportTaskAvatar,
+    studyTaskAvatar,
+    taskTaskAvatar,
+    walkTaskAvatar,
+    workTaskAvatar,
+    PlusTaskAvatar,
 };
 
 export const defaultCategories = {
     0: {
         title: 'Прогулка',
-        avatar: 'walkEventAvatar',
+        avatar: 'walkTaskAvatar',
         activities: ['Пикник', 'Экскурсия', 'Обычная прогулка', 'Прогулка на транспорте', 'Другое']
     },
     1: {
         title: 'Работа',
-        avatar: 'workEventAvatar',
+        avatar: 'workTaskAvatar',
         activities: ['Работа', 'Учеба', 'Волонтерство', 'Командировка', 'Конференция', 'Тренинги', 'Курсы', 'Другое']
     },
     2: {
         title: 'Встреча',
-        avatar: 'meetingEventAvatar',
+        avatar: 'meetingTaskAvatar',
         activities: ['Свидание', 'Деловая встреча', 'Личная встреча', 'Переговоры', 'Интервью', 'Консультация', 'Собеседование', 'Другое']
     },
     3: {
         title: 'Питание',
-        avatar: 'foodEventAvatar',
+        avatar: 'foodTaskAvatar',
         activities: ['Кафе', 'Ресторан', 'Бар', 'Дом', 'Другое']
     },
     4: {
         title: 'Отдых',
-        avatar: 'relaxEventAvatar',
+        avatar: 'relaxTaskAvatar',
         activities: ['Сон', 'Просмотр фильма/сериала', 'Природа', 'Театр', 'Концерт', 'Медитация', 'Общение', 'Игры', 'Чтение', 'Другое']
     },
     5: {
         title: 'Уборка',
-        avatar: 'cleanEventAvatar',
+        avatar: 'cleanTaskAvatar',
         activities: ['Генеральная уборка', 'Обычная уборка', 'Другое']
     },
     6: {
         title: 'Гигиена',
-        avatar: 'hygieneEventAvatar',
+        avatar: 'hygieneTaskAvatar',
         activities: ['Ванная', 'Душ', 'Баня', 'Сауна', 'Парикмахерская', 'Салон красоты', 'Косметические процедуры', 'Уход за телом', 'Другое']
     },
     7: {
         title: 'Питомец',
-        avatar: 'petEventAvatar',
+        avatar: 'petTaskAvatar',
         activities: ['Кормление', 'Выгул', 'Дрессировка/тренировка', 'Ветеринар', 'Чистка/гигиена', 'Другое']
     },
     8: {
         title: 'Магазин',
-        avatar: 'shopEventAvatar',
+        avatar: 'shopTaskAvatar',
         activities: ['Продуктовый магазин', 'Торговый центр', 'Одежда', 'Обувь', 'Косметика', 'Техника', 'Мебель', 'Подарки', 'Книги', 'Аптека', 'Цветы', 'Для питомца', 'Автомагазин', 'Строительный магазин', 'Другое']
     },
     9: {
         title: 'Здоровье',
-        avatar: 'healthEventAvatar',
+        avatar: 'healthTaskAvatar',
         activities: ['Врач', 'Спорт', 'Лечебные процедуры', 'Спортзал', 'Бассейн', 'Другое']
     },
     10: {
         title: 'Приключение',
-        avatar: 'adventureEventAvatar',
+        avatar: 'adventureTaskAvatar',
         activities: ['Поход', 'Туризм', 'Охота', 'Рыбалка', 'Исследование', 'Полет', 'Поездка', 'Путешествие', 'Другое']
     },
 }

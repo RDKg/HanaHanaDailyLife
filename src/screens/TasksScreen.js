@@ -12,7 +12,8 @@ import * as Location from 'expo-location';
 import * as constants from '../styles/constants.js';
 import * as components from '../components.js';
 import * as utils from '../utils.js';
-import { openDB, DatabaseService, Event } from '../data/databaseService.js';
+import { NotificationsService } from '../backgroundTask.js';
+import { openDB, DatabaseService, Task } from '../data/databaseService.js';
 import { styles } from '../styles/styles.js';
 
 import HistorySVG from '../../assets/ico/history-ico.svg';
@@ -22,26 +23,26 @@ const Stack = createNativeStackNavigator();
 const db = openDB('HanaHanaDailyLife.db');
 const dbService = new DatabaseService(db);
 
-export const EventTabNavigator = ({route}) => {
+export const TaskTabNavigator = ({route}) => {
     const withGoBack = route?.params?.withGoBack;
 
     return (
         <Stack.Navigator
-            initialRouteName='HomeEvent'
+            initialRouteName='HomeTask'
             screenOptions={
                 {
                     headerShown: false
                 }
             }
         >
-            <Stack.Screen name='HomeEvent' component={EventsScreen} initialParams={{withGoBack}}/>
-            <Stack.Screen name='EventEditor' component={EventEditorScreen}/>
-            <Stack.Screen name='EventDetails' component={EventDetailsScreen}/>
+            <Stack.Screen name='HomeTask' component={TasksScreen} initialParams={{withGoBack}}/>
+            <Stack.Screen name='TaskEditor' component={TaskEditorScreen}/>
+            <Stack.Screen name='TaskDetails' component={TaskDetailsScreen}/>
         </Stack.Navigator>
     )
 }
 
-export const EventsScreen = ({navigation, route}) => {
+export const TasksScreen = ({navigation, route}) => {
     const withGoBack = route?.params?.withGoBack;
     const currentDate = new Date();
     const itemsPerPage = 10;
@@ -66,7 +67,7 @@ export const EventsScreen = ({navigation, route}) => {
     }, [route?.params?.isReload]);
 
     const fetchData = () => {
-        const events = [];
+        const tasks = [];
         const condition = isShowingCompleted ? [
             {field: 'ended_at', comparison: '<=', value: currentDate.getTime()}
         ] : [
@@ -77,13 +78,13 @@ export const EventsScreen = ({navigation, route}) => {
             dbService.getTableData('category'),
             dbService.getTableData('activity'),
             dbService.getTableData(
-                'event', 
+                'task', 
                 {orderBy: 'started_at', typeOrder: 'ASC'},
                 condition,
                 {limit: requestDataCount},
             )
         ])
-        .then(([categoryResult, activityResult, eventsResult]) => {
+        .then(([categoryResult, activityResult, tasksResult]) => {
             const categories = categoryResult._array.map(item => ({
                 key: item.id,
                 value: item.title,
@@ -94,7 +95,7 @@ export const EventsScreen = ({navigation, route}) => {
                 key: item.id,
                 value: item.title
             }))
-            eventsResult._array.forEach((item) => {
+            tasksResult._array.forEach((item) => {
                 const date = new Date(item.started_at);
                 const formattedDate = utils.convertDateToStringFormat(date, {isHour: false, isMinute: false});
                 const data = {
@@ -107,20 +108,20 @@ export const EventsScreen = ({navigation, route}) => {
                     }]
                 };
                 
-                const existingItemIndex = events.findIndex((findIndex) => findIndex.title == formattedDate);
+                const existingItemIndex = tasks.findIndex((findIndex) => findIndex.title == formattedDate);
 
                 if (existingItemIndex !== -1) {
-                    events[existingItemIndex].data.push(data.data[0])
+                    tasks[existingItemIndex].data.push(data.data[0])
                 } 
                 else {
-                    events.push(data);
+                    tasks.push(data);
                 }
             });
 
             setData({
                 categories,
                 activities,
-                events
+                tasks
             });
             setIsDataLoaded(true);
         });
@@ -181,16 +182,16 @@ export const EventsScreen = ({navigation, route}) => {
                     }
                 >
                     <View style={{...styles.mainContainerDefault}}>
-                        <components.EventButton
-                            onPress={() => navigation.navigate('EventEditor', {withGoBack: true, prevScreenName: 'HomeEvent'})}
-                            AvatarComponent={constants.avatars.PlusEventAvatar}
+                        <components.TaskButton
+                            onPress={() => navigation.navigate('TaskEditor', {withGoBack: true, prevScreenName: 'HomeTask'})}
+                            AvatarComponent={constants.avatars.PlusTaskAvatar}
                             title={'Добавить новый план'}
                         />
                         {
-                            data?.events &&
-                            <components.EventsButtons
-                                currentScreenName='HomeEvent'
-                                data={data?.events}
+                            data?.tasks &&
+                            <components.TasksButtons
+                                currentScreenName='HomeTask'
+                                data={data?.tasks}
                                 navigation={navigation}
                             />
                         }
@@ -201,10 +202,10 @@ export const EventsScreen = ({navigation, route}) => {
     );
 }
 
-export const EventEditorScreen = ({navigation, route}) => {
+export const TaskEditorScreen = ({navigation, route}) => {
     const withGoBack = route?.params?.withGoBack;
     const prevScreenName = route.params?.prevScreenName;
-    const eventData = route?.params?.data;
+    const taskData = route?.params?.data;
     const currentDate = new Date();
     const datePlusMinute = new Date(currentDate.getTime() + 60 * 1000);
 
@@ -268,7 +269,7 @@ export const EventEditorScreen = ({navigation, route}) => {
         }
     }
 
-    const getNewEventData = () => {
+    const getNewTaskData = () => {
         const result = {
             title: title || 'Без названия',
             description: description || 'Описание отсутствует',
@@ -286,32 +287,34 @@ export const EventEditorScreen = ({navigation, route}) => {
             activity_id: selectedActivityID + 1 ? selectedActivityID : null,
         };
 
-        if (eventData) {
-            result['id'] = eventData?.id;
+        if (taskData) {
+            result['id'] = taskData?.id;
         }
 
         return result;
     }
 
-    const createEvent = () => {
-        const newEventData = getNewEventData();
-        const eventValidation = new Event(newEventData);
+    const createTask = () => {
+        const newTaskData = getNewTaskData();
+        const taskValidation = new Task(newTaskData);
 
-        setValidationErrors(eventValidation.errors);
+        setValidationErrors(taskValidation.errors);
 
-        if (Object.keys(eventValidation.errors).length === 0) {
-            dbService.insertData('event', newEventData);
+        if (Object.keys(taskValidation.errors).length === 0) {
+            dbService.insertData('task', newTaskData);
+            NotificationsService.scheduleStartTaskNotification(newTaskData);
+            NotificationsService.scheduleEndTaskNotification(newTaskData);
             navigation.navigate(prevScreenName, {isReload: true});
         }
     } 
 
-    const changeEvent = () => {
-        const newEventData = getNewEventData();
-        const eventValidation = new Event(newEventData);
+    const changeTask = () => {
+        const newTaskData = getNewTaskData();
+        const taskValidation = new Task(newTaskData);
 
-        setValidationErrors(eventValidation.errors);
+        setValidationErrors(taskValidation.errors);
 
-        if (new Date(eventData.started_at) <= currentDate) {
+        if (new Date(taskData.started_at) <= currentDate) {
             Alert.alert(
                 'Ошибка',
                 'Данная задача уже началась и изменить ее невозможно.',
@@ -325,13 +328,16 @@ export const EventEditorScreen = ({navigation, route}) => {
 
             navigation.navigate(prevScreenName);
         }
-        else if (Object.keys(eventValidation.errors).length === 0) {
-            dbService.updateData('event', newEventData)
+        else if (Object.keys(taskValidation.errors).length === 0) {
+            dbService.updateData('task', newTaskData);
+            NotificationsService.cancelScheduleTaskNotification(newTaskData.id);
+            NotificationsService.scheduleStartTaskNotification(newTaskData);
+            NotificationsService.scheduleEndTaskNotification(newTaskData);
             navigation.navigate(prevScreenName, {isReload: true});
         }
     }
 
-    const deleteEvent = () => {
+    const deleteTask = () => {
         Alert.alert(
             'Удалить задачу',
             'Вы уверены, что хотите удалить задачу?',
@@ -339,7 +345,8 @@ export const EventEditorScreen = ({navigation, route}) => {
                 {
                     text: 'ДА',
                     onPress: () => {
-                        dbService.deleteData('event', eventData.id);
+                        dbService.deleteData('task', taskData.id);
+                        NotificationsService.cancelScheduleTaskNotification(taskData.id);
                         navigation.navigate(prevScreenName, {isReload: true});
                     },
                 },
@@ -351,107 +358,58 @@ export const EventEditorScreen = ({navigation, route}) => {
         );
     }
 
+    // Проверка включенной геолокации и разрешений на нее
+    useEffect(() => {
+        utils.checkLocation()
+        .then(({ isBackgroundGranted, isForegroundGranted, isLocationEnabled }) => {
+            setLocationSettingsData({
+                isForegroundGranted,
+                isBackgroundGranted,
+                isLocationEnabled
+            })
+        });
+    }, []);
+
     // Если были переданы данные об ивенте, то устанавливаем их
     useEffect(() => {
-        if (eventData) {
-            setIsMapEnabled(eventData?.is_map_enabled);
-            setIsRouteFollowing(eventData?.is_route_following);
+        if (taskData) {
+            setIsMapEnabled(taskData?.is_map_enabled);
+            setIsRouteFollowing(taskData?.is_route_following);
             setStartLocation(        
-                eventData.start_longitude && eventData.start_latitude ?
+                taskData.start_longitude && taskData.start_latitude ?
                 {
-                    longitude: eventData?.start_longitude,
-                    latitude: eventData?.start_latitude,
+                    longitude: taskData?.start_longitude,
+                    latitude: taskData?.start_latitude,
                 } :
                 null
             );
             setEndLocation(
-                eventData.end_longitude && eventData.end_latitude ?
+                taskData.end_longitude && taskData.end_latitude ?
                 {
-                    longitude: eventData?.end_longitude,
-                    latitude: eventData?.end_latitude,
+                    longitude: taskData?.end_longitude,
+                    latitude: taskData?.end_latitude,
                 } :
                 null
             );
-            setSelectedCategoryID(eventData?.category_id);
-            setSelectedActivityID(eventData?.activity_id);
-            setTitle(eventData?.title);
-            setDescription(eventData?.description);
-            setBudget(eventData?.budget);
-            setStartDate(new Date(eventData?.started_at));
-            setEndDate(new Date(eventData?.ended_at));
+            setSelectedCategoryID(taskData?.category_id);
+            setSelectedActivityID(taskData?.activity_id);
+            setTitle(taskData?.title);
+            setDescription(taskData?.description);
+            setBudget(taskData?.budget);
+            setStartDate(new Date(taskData?.started_at));
+            setEndDate(new Date(taskData?.ended_at));
         }
     }, []);
 
     // Получаем переданные данные, которые должны обновиться после получения данных из БД
     useEffect(() => {
-        if (eventData && locationSettingsData.isForegroundGranted !== null) {
-            setIsMapEnabled(eventData?.is_map_enabled);
+        if (taskData && locationSettingsData.isForegroundGranted !== null) {
+            setIsMapEnabled(taskData?.is_map_enabled);
         }
-        if (eventData && locationSettingsData.isBackgroundGranted !== null) {
-            setIsRouteFollowing(eventData.is_route_following);
+        if (taskData && locationSettingsData.isBackgroundGranted !== null) {
+            setIsRouteFollowing(taskData.is_route_following);
         }
     }, [locationSettingsData]);
-
-    // Проверка включенной геолокации и разрешений на нее
-    useEffect(() => {
-        utils.isLocationSettingEnabled()
-        .then(locationEnabled => {
-            setLocationSettingsData(prevState => ({
-                ...prevState,
-                isLocationEnabled: locationEnabled
-            }));
-            
-            if (locationEnabled === false) {
-                Alert.alert(
-                    'Геолокация',
-                    'Для полной работы приложения желательно включить геолокацию.',
-                    [{text: 'ОК', onPress: () => {}}]
-                );
-            }
-            else {
-                utils.isForegroundLocationPermissionGranted()
-                .then(foregroundResult => {
-                    setIsMapEnabled(foregroundResult);
-                    setLocationSettingsData(prevState => ({
-                        ...prevState,
-                        isForegroundGranted: foregroundResult
-                    }));
-                
-                    if (foregroundResult === false) {
-                        Alert.alert(
-                            'Разрешения',
-                            'Для полной работы приложения желательно разрешить отслеживание геолокации.',
-                            [
-                                {text: 'Не хочу', onPress: () => {}},
-                                {text: 'Предоставить разрешение', onPress: () => Linking.openSettings()},
-                            ]
-                        );
-                    }
-                    else {
-                        utils.isBackgroundLocationPermissionGranted()
-                        .then(backgroundResult => {
-                            setIsRouteFollowing(backgroundResult)
-                            setLocationSettingsData(prevState => ({
-                                ...prevState,
-                                isBackgroundGranted: backgroundResult
-                            }));
-        
-                            if (backgroundResult === false) {
-                                Alert.alert(
-                                    'Разрешения',
-                                    'Для полной работы приложения желательно разрешить доступ к геолокации в любое время.',
-                                    [
-                                        {text: 'Не хочу', onPress: () => {}},
-                                        {text: 'Предоставить разрешение', onPress: () => Linking.openSettings()},
-                                    ]
-                                );
-                            }
-                        });
-                    }
-                });
-            }
-        });
-    }, []);
 
     // Получаем категории и активности из БД
     useEffect(() => {
@@ -747,21 +705,21 @@ export const EventEditorScreen = ({navigation, route}) => {
                             }}
                         >   
                             {
-                                eventData ?
+                                taskData ?
                                 <Fragment>
                                     <components.CustomButton 
                                         title='Удалить' 
-                                        onPress={deleteEvent}
+                                        onPress={deleteTask}
                                         backgroundColor={utils.convertColorDataToString(constants.pinkColor)}
                                     />
                                     <components.CustomButton 
                                         title='Изменить'
-                                        onPress={changeEvent}
+                                        onPress={changeTask}
                                     />
                                 </Fragment> :
                                 <Fragment>
                                     <View/>
-                                    <components.CustomButton title='Создать' onPress={createEvent}/>
+                                    <components.CustomButton title='Создать' onPress={createTask}/>
                                 </Fragment>
                             }
                         </View>
@@ -772,10 +730,10 @@ export const EventEditorScreen = ({navigation, route}) => {
     );
 }
  
-export const EventDetailsScreen = ({navigation, route}) => {
+export const TaskDetailsScreen = ({navigation, route}) => {
     const withGoBack = route?.params?.withGoBack;
     const prevScreenName = route.params?.prevScreenName;
-    const eventData = route?.params?.data;
+    const taskData = route?.params?.data;
     const currentDate = new Date();
 
     const [data, setData] = useState();
@@ -785,7 +743,7 @@ export const EventDetailsScreen = ({navigation, route}) => {
         isLocationEnabled: null,
     });
 
-    const [isMapEnabled, setIsMapEnabled] = useState(eventData.is_map_enabled);
+    const [isMapEnabled, setIsMapEnabled] = useState(taskData.is_map_enabled);
 
     const [currentLocation, setCurrentLocation] = useState();
     const [initialLocation, setInitialLocation] = useState();
@@ -793,7 +751,7 @@ export const EventDetailsScreen = ({navigation, route}) => {
     const [titleActivity, setTitleActivity] = useState();
     const [titleCategory, setTitleCategory] = useState();
 
-    const deleteEvent = () => {
+    const deleteTask = () => {
         Alert.alert(
             'Удалить задачу',
             'Вы уверены, что хотите удалить задачу?',
@@ -801,7 +759,8 @@ export const EventDetailsScreen = ({navigation, route}) => {
                 {
                     text: 'ДА',
                     onPress: () => {
-                        dbService.deleteData('event', eventData.id);
+                        dbService.deleteData('task', taskData.id);
+                        NotificationsService.cancelScheduleTaskNotification(taskData.id);
                         navigation.navigate(prevScreenName, {isReload: true});
                     },
                 },
@@ -813,8 +772,8 @@ export const EventDetailsScreen = ({navigation, route}) => {
         );
     }
 
-    const finishEvent = () => {
-        if (currentDate < new Date(eventData.ended_at)) {
+    const finishTask = () => {
+        if (currentDate < new Date(taskData.ended_at)) {
             Alert.alert(
                 'Завершить задачу',
                 'Вы уверены, что хотите завершить задачу сейчас?',
@@ -822,7 +781,8 @@ export const EventDetailsScreen = ({navigation, route}) => {
                     {
                         text: 'ДА',
                         onPress: () => {
-                            dbService.updateData('event', {id: eventData.id, ended_at: currentDate.getTime()});
+                            dbService.updateData('task', {id: taskData.id, ended_at: currentDate.getTime()});
+                            NotificationsService.cancelScheduleTaskNotification(taskData.id);
                             navigation.navigate(prevScreenName, {isReload: true});
                         },
                     },
@@ -851,66 +811,19 @@ export const EventDetailsScreen = ({navigation, route}) => {
 
     // Проверка включенной геолокации и разрешений на нее
     useEffect(() => {
-        utils.isLocationSettingEnabled()
-        .then(locationEnabled => {
-            setLocationSettingsData(prevState => ({
-                ...prevState,
-                isLocationEnabled: locationEnabled
-            }));
-            
-            if (locationEnabled === false) {
-                Alert.alert(
-                    'Геолокация',
-                    'Для полной работы приложения желательно включить геолокацию.',
-                    [{text: 'ОК', onPress: () => {}}]
-                );
-            }
-            else {
-                utils.isForegroundLocationPermissionGranted()
-                .then(foregroundResult => {
-                    setLocationSettingsData(prevState => ({
-                        ...prevState,
-                        isForegroundGranted: foregroundResult
-                    }));
-                
-                    if (foregroundResult === false) {
-                        Alert.alert(
-                            'Разрешения',
-                            'Для полной работы приложения желательно разрешить отслеживание геолокации.',
-                            [
-                                {text: 'Не хочу', onPress: () => {}},
-                                {text: 'Предоставить разрешение', onPress: () => Linking.openSettings()},
-                            ]
-                        );
-                    }
-                    else {
-                        utils.isBackgroundLocationPermissionGranted()
-                        .then(backgroundResult => {
-                            setLocationSettingsData(prevState => ({
-                                ...prevState,
-                                isBackgroundGranted: backgroundResult
-                            }));
-        
-                            if (backgroundResult === false) {
-                                Alert.alert(
-                                    'Разрешения',
-                                    'Для полной работы приложения желательно разрешить доступ к геолокации в любое время.',
-                                    [
-                                        {text: 'Не хочу', onPress: () => {}},
-                                        {text: 'Предоставить разрешение', onPress: () => Linking.openSettings()},
-                                    ]
-                                );
-                            }
-                        });
-                    }
-                });
-            }
+        utils.checkLocation()
+        .then(({ isBackgroundGranted, isForegroundGranted, isLocationEnabled }) => {
+            setLocationSettingsData({
+                isForegroundGranted,
+                isBackgroundGranted,
+                isLocationEnabled
+            })
         });
     }, []);
 
     // Получаем текущую геолокацию пользователя каждые 10 секунд
     useEffect(() => {
-        if (locationSettingsData.isLocationEnabled && eventData.is_map_enabled) {
+        if (locationSettingsData.isLocationEnabled && taskData.is_map_enabled) {
             const interval = setInterval(() => {
                 utils.getCurrentLocation()
                 .then(result => {
@@ -923,8 +836,8 @@ export const EventDetailsScreen = ({navigation, route}) => {
     });
     
     useEffect(() => {
-        const latitude = eventData?.start_latitude || eventData?.end_latitude || currentLocation?.latitude;
-        const longitude = eventData?.start_longitude || eventData?.end_longitude || currentLocation?.longitude;
+        const latitude = taskData?.start_latitude || taskData?.end_latitude || currentLocation?.latitude;
+        const longitude = taskData?.start_longitude || taskData?.end_longitude || currentLocation?.longitude;
 
         setIsMapEnabled(latitude != null && longitude != null);
 
@@ -956,8 +869,8 @@ export const EventDetailsScreen = ({navigation, route}) => {
     // Получаем названия выбранной активност и категории
     useEffect(() => {
         if (data?.activities && data?.categories) {
-            const activity = data.activities.find(item => item.id === eventData.activity_id);
-            const category = data.categories.find(item => item.id === eventData.category_id);
+            const activity = data.activities.find(item => item.id === taskData.activity_id);
+            const category = data.categories.find(item => item.id === taskData.category_id);
 
             setTitleActivity(activity.title); 
             setTitleCategory(category.title);
@@ -985,11 +898,11 @@ export const EventDetailsScreen = ({navigation, route}) => {
                         initialRegion={initialLocation}
                     >
                         {
-                            eventData.start_latitude && eventData.start_longitude &&
+                            taskData.start_latitude && taskData.start_longitude &&
                             <Marker
                                 coordinate={{
-                                    latitude: eventData.start_latitude,
-                                    longitude: eventData.start_longitude
+                                    latitude: taskData.start_latitude,
+                                    longitude: taskData.start_longitude
                                 }}
                                 pinColor={utils.convertColorDataToString(constants.pinkColor)}
                                 title='Начальная позиция'
@@ -997,11 +910,11 @@ export const EventDetailsScreen = ({navigation, route}) => {
                             />
                         }
                         {
-                            eventData.end_latitude && eventData.end_longitude &&
+                            taskData.end_latitude && taskData.end_longitude &&
                             <Marker
                                 coordinate={{
-                                    latitude: eventData.end_latitude,
-                                    longitude: eventData.end_longitude
+                                    latitude: taskData.end_latitude,
+                                    longitude: taskData.end_longitude
                                 }}
                                 pinColor={utils.convertColorDataToString(constants.greenColor)}
                                 title='Конечная позиция'
@@ -1035,7 +948,7 @@ export const EventDetailsScreen = ({navigation, route}) => {
                                 gap: constants.padding
                             }}
                         >
-                            <Text style={styles.boxTitleText}>{eventData?.title}</Text>
+                            <Text style={styles.boxTitleText}>{taskData?.title}</Text>
                             <components.CustomLine height={1} width={'100%'}/>
                             <View
                                 style={{
@@ -1045,7 +958,7 @@ export const EventDetailsScreen = ({navigation, route}) => {
                                     width: '100%',
                                 }}
                             >
-                                <Text style={{...styles.descriptionText}}>{eventData.description}</Text>
+                                <Text style={{...styles.descriptionText}}>{taskData.description}</Text>
                             </View>
                             <Text 
                                 style={{
@@ -1054,7 +967,7 @@ export const EventDetailsScreen = ({navigation, route}) => {
                                 }}
                             >
                                 <Text style={{...styles.defaultLabelText, fontFamily: 'RalewayMedium'}}>Начало: </Text> 
-                                {utils.convertDateToStringFormat(new Date(eventData.started_at), {})}
+                                {utils.convertDateToStringFormat(new Date(taskData.started_at), {})}
                             </Text>
                             <Text 
                                 style={{
@@ -1063,7 +976,7 @@ export const EventDetailsScreen = ({navigation, route}) => {
                                 }}
                             >
                                 <Text style={{...styles.defaultLabelText, fontFamily: 'RalewayMedium'}}>Конец: </Text> 
-                                {utils.convertDateToStringFormat(new Date(eventData.ended_at), {})}
+                                {utils.convertDateToStringFormat(new Date(taskData.ended_at), {})}
                             </Text>
                             <Text style={styles.defaultLabelText}
                             >
@@ -1077,7 +990,7 @@ export const EventDetailsScreen = ({navigation, route}) => {
                             </Text>
                             <Text style={styles.defaultLabelText}>
                                 <Text style={{...styles.defaultLabelText, fontFamily: 'RalewayMedium'}}>Потрачено: </Text> 
-                                {eventData.budget}₽
+                                {taskData.budget}₽
                             </Text>
                             <Text style={styles.defaultLabelText}>
                                 <Text style={{...styles.defaultLabelText, fontFamily: 'RalewayMedium'}}>Пройдено: </Text> 
@@ -1092,19 +1005,19 @@ export const EventDetailsScreen = ({navigation, route}) => {
                         >   
                             <Fragment>
                                 {
-                                    currentDate >= eventData.ended_at &&
+                                    currentDate >= taskData.ended_at &&
                                     <View></View>
                                 }
                                 <components.CustomButton 
                                     backgroundColor={utils.convertColorDataToString(constants.pinkColor)} 
                                     title='Удалить' 
-                                    onPress={deleteEvent}
+                                    onPress={deleteTask}
                                 />
                                 {
-                                    currentDate < eventData.ended_at &&
+                                    currentDate < taskData.ended_at &&
                                     <components.CustomButton 
                                         title='Завершить сейчас' 
-                                        onPress={finishEvent}
+                                        onPress={finishTask}
                                     />
                                 }
                             </Fragment>

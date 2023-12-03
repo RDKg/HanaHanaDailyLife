@@ -1,34 +1,39 @@
-import React, { useCallback } from 'react';
-import { View } from 'react-native';
+import React, { useCallback, useEffect } from 'react';
+import { View, StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
+import * as TaskManager from 'expo-task-manager';
+import * as Notifications from 'expo-notifications';
 import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'react-native';
 import * as Font from 'expo-font';
 
 import * as components from './src/components.js';
 import * as constants from './src/styles/constants.js';
 import * as utils from './src/utils.js';
+import { NotificationsService } from './src/backgroundTask.js';
 import { openDB, DatabaseService } from './src/data/databaseService.js';
 
-import { EventTabNavigator } from './src/screens/EventsScreen.js';
-import { NotificationsScreen } from './src/screens/NotificationsScreen.js';
+import { TaskTabNavigator } from './src/screens/TasksScreen.js';
+import { SettingsScreen } from './src/screens/SettingsScreen.js';
 import { ProfileTabNavigator } from './src/screens/ProfileScreen.js';
 import { StatsScreen } from './src/screens/StatsScreen.js';
 import { HomeTabNavigator } from './src/screens/HomeScreen.js'
- 
-SplashScreen.preventAutoHideAsync();
 
 const Tab = createBottomTabNavigator();
 
 const db = openDB('HanaHanaDailyLife.db');
 const dbService = new DatabaseService(db);
+// dbService.getAllTableNames().then(result => {
+//     result._array.forEach(item => {
+//         console.log(item)
+//         dbService.dropTableData(item.name) 
+//     })
+// }) 
+dbService.createAndInsertDefaultData();  
 
-// dbService.dropTableData('event')
-// dbService.dropTableData('category')
-// dbService.dropTableData('activity')
-dbService.createAndInsertDefaultData(); 
+SplashScreen.preventAutoHideAsync();
+NotificationsService.registerForPushNotifications(); 
 
 export default function App() {
     const [fontsLoaded] = Font.useFonts(constants.fontFiles);
@@ -103,24 +108,24 @@ export default function App() {
                     }
                 />
                 <Tab.Screen 
-                    name='EventsTab' 
-                    component={EventTabNavigator} 
+                    name='TasksTab' 
+                    component={TaskTabNavigator} 
                     options={
                         { 
                             tabBarIcon: ({focused}) => <components.TabBarIcon 
-                                svgXmlStringObj={utils.svgXmlStringsObject.Events} 
+                                svgXmlStringObj={utils.svgXmlStringsObject.Tasks} 
                                 isFocused={focused}
                             />
                         }
                     }
                 />
                 <Tab.Screen 
-                    name='NotificationsTab' 
-                    component={NotificationsScreen} 
+                    name='SettingsTab' 
+                    component={SettingsScreen} 
                     options={
                         { 
                             tabBarIcon: ({focused}) => <components.TabBarIcon 
-                                svgXmlStringObj={utils.svgXmlStringsObject.Notifications} 
+                                svgXmlStringObj={utils.svgXmlStringsObject.Settings} 
                                 isFocused={focused}
                             />
                         }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Alert, Linking } from 'react-native';
 
 import * as Location from 'expo-location';
 
@@ -8,11 +9,11 @@ export const svgXmlStringsObject = {
     Stats: graphIcoXmlStringSvg,
     Profile: profileIcoXmlStringSvg,
     Home: homeIcoXmlStringSvg,
-    Events: eventIcoXmlStringSvg,
-    Notifications: notifcationsIcoXmlStringSvg,
+    Tasks: taskIcoXmlStringSvg,
+    Settings: settingsIcoXmlStringSvg,
 }
 
-export function eventIcoXmlStringSvg(isFillGradient) {
+export function taskIcoXmlStringSvg(isFillGradient) {
     let gradientFill = isFillGradient ? 'url(#gradient)' : '#525252'; 
 
     let svgXmlString = `
@@ -105,13 +106,14 @@ export function homeIcoXmlStringSvg(isFillGradient) {
     return svgXmlString;
 }
 
-export function notifcationsIcoXmlStringSvg(isFillGradient) {
+export function settingsIcoXmlStringSvg(isFillGradient) {
     let gradientFill = isFillGradient ? 'url(#gradient)' : '#525252'; 
 
     let svgXmlString = `
-        <svg width='26' height='26' viewBox='0 0 26 26' fill='none' xmlns='http://www.w3.org/2000/svg'>
+        <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M23.4939 13.1667C23.4939 12.8677 23.4805 12.5817 23.4538 12.2827L25.9406 10.4497C26.4754 10.0597 26.6225 9.33166 26.2882 8.75966L23.788 4.56066C23.6277 4.2853 23.3684 4.07724 23.0599 3.97646C22.7515 3.87568 22.4156 3.88928 22.1168 4.01466L19.2423 5.19766C18.7476 4.85966 18.2261 4.56066 17.678 4.31366L17.2902 1.31066C17.21 0.660657 16.6351 0.166656 15.9666 0.166656H10.9796C10.2978 0.166656 9.72285 0.660657 9.64263 1.31066L9.2549 4.31366C8.70673 4.56066 8.1853 4.85966 7.69061 5.19766L4.81607 4.01466C4.20106 3.75466 3.47908 3.98866 3.14483 4.56066L0.644649 8.77266C0.310401 9.34466 0.45747 10.0597 0.992268 10.4627L3.47908 12.2957C3.42366 12.8794 3.42366 13.4669 3.47908 14.0507L0.992268 15.8837C0.45747 16.2737 0.310401 17.0017 0.644649 17.5737L3.14483 21.7727C3.47908 22.3447 4.20106 22.5787 4.81607 22.3187L7.69061 21.1357C8.1853 21.4737 8.70673 21.7727 9.2549 22.0197L9.64263 25.0227C9.72285 25.6727 10.2978 26.1667 10.9663 26.1667H15.9532C16.6217 26.1667 17.1966 25.6727 17.2769 25.0227L17.6646 22.0197C18.2128 21.7727 18.7342 21.4737 19.2289 21.1357L22.1034 22.3187C22.7184 22.5787 23.4404 22.3447 23.7747 21.7727L26.2748 17.5737C26.6091 17.0017 26.462 16.2867 25.9272 15.8837L23.4404 14.0507C23.4805 13.7517 23.4939 13.4657 23.4939 13.1667ZM13.5199 17.7167C10.9395 17.7167 8.84043 15.6757 8.84043 13.1667C8.84043 10.6577 10.9395 8.61666 13.5199 8.61666C16.1003 8.61666 18.1994 10.6577 18.1994 13.1667C18.1994 15.6757 16.1003 17.7167 13.5199 17.7167Z" fill='${gradientFill}'/>
             <defs>
-                <linearGradient  
+                <linearGradient 
                     id='gradient' 
                     x1=${constants.pinkToPurpleLightGradient.start.x}
                     y1=${constants.pinkToPurpleLightGradient.start.y}
@@ -122,11 +124,7 @@ export function notifcationsIcoXmlStringSvg(isFillGradient) {
                     <Stop offset='1' stop-color='${constants.pinkToPurpleLightGradient.colors[1]}'/>
                 </linearGradient>
             </defs>
-            <path 
-                d="M23.8776 13.5306V24.1429C23.8776 24.6354 23.6819 25.1078 23.3336 25.4561C22.9853 25.8043 22.513 26 22.0204 26H1.85714C1.3646 26 0.892226 25.8043 0.543945 25.4561C0.195663 25.1078 0 24.6354 0 24.1429V3.97959C0 3.48705 0.195663 3.01468 0.543945 2.66639C0.892226 2.31811 1.3646 2.12245 1.85714 2.12245H12.4694C12.6805 2.12245 12.8829 2.2063 13.0322 2.35557C13.1815 2.50483 13.2653 2.70728 13.2653 2.91837C13.2653 3.12946 13.1815 3.3319 13.0322 3.48117C12.8829 3.63043 12.6805 3.71429 12.4694 3.71429H1.85714C1.78678 3.71429 1.7193 3.74224 1.66954 3.79199C1.61979 3.84175 1.59184 3.90923 1.59184 3.97959V24.1429C1.59184 24.2132 1.61979 24.2807 1.66954 24.3305C1.7193 24.3802 1.78678 24.4082 1.85714 24.4082H22.0204C22.0908 24.4082 22.1583 24.3802 22.208 24.3305C22.2578 24.2807 22.2857 24.2132 22.2857 24.1429V13.5306C22.2857 13.3195 22.3696 13.1171 22.5188 12.9678C22.6681 12.8185 22.8705 12.7347 23.0816 12.7347C23.2927 12.7347 23.4952 12.8185 23.6444 12.9678C23.7937 13.1171 23.8776 13.3195 23.8776 13.5306ZM26 4.5102C26 5.40224 25.7355 6.27424 25.2399 7.01594C24.7443 7.75764 24.0399 8.33572 23.2158 8.67709C22.3916 9.01846 21.4848 9.10777 20.6099 8.93375C19.735 8.75972 18.9314 8.33016 18.3006 7.6994C17.6698 7.06864 17.2403 6.265 17.0663 5.3901C16.8922 4.51521 16.9815 3.60836 17.3229 2.78422C17.6643 1.96009 18.2424 1.25569 18.9841 0.760107C19.7258 0.264519 20.5978 0 21.4898 0C22.686 0 23.8332 0.475181 24.679 1.32101C25.5248 2.16684 26 3.31402 26 4.5102ZM24.4082 4.5102C24.4082 3.93301 24.237 3.36877 23.9163 2.88885C23.5957 2.40892 23.1399 2.03487 22.6066 1.81398C22.0733 1.5931 21.4866 1.53531 20.9205 1.64791C20.3543 1.76052 19.8343 2.03847 19.4262 2.44661C19.0181 2.85475 18.7401 3.37475 18.6275 3.94086C18.5149 4.50697 18.5727 5.09375 18.7936 5.62702C19.0145 6.16028 19.3885 6.61606 19.8684 6.93674C20.3484 7.25741 20.9126 7.42857 21.4898 7.42857C22.2638 7.42857 23.0061 7.1211 23.5534 6.5738C24.1007 6.0265 24.4082 5.2842 24.4082 4.5102Z" 
-                fill='${gradientFill}'
-            />
-        </svg>
+        </svg>    
     `;
     
     return svgXmlString;
@@ -277,4 +275,78 @@ export async function getCurrentLocation(
 
         return {}
     }
+}
+
+export async function checkLocation() {
+    let isForegroundGranted = false;
+    let isBackgroundGranted = false;
+    let isLocationEnabled = false;
+
+    const checkLocationSetting = async () => {
+        isLocationEnabled = await isLocationSettingEnabled();
+
+        if (!isLocationEnabled) {
+            showLocationSettingAlert();
+        } else {
+            checkForegroundPermission();
+        }
+    };
+
+    const checkForegroundPermission = async () => {
+        isForegroundGranted = await isForegroundLocationPermissionGranted();
+
+        if (!isForegroundGranted) {
+            showForegroundPermissionAlert();
+        } else {
+            checkBackgroundPermission();
+        }
+    };
+
+    const checkBackgroundPermission = async () => {
+        isBackgroundGranted = await isBackgroundLocationPermissionGranted();
+
+        if (!isBackgroundGranted) {
+            showBackgroundPermissionAlert();
+        }
+    };
+
+    const showLocationSettingAlert = () => {
+        Alert.alert(
+            'Геолокация',
+            'Для полной работы приложения желательно включить геолокацию.',
+            [
+                {text: 'ОК', onPress: () => {}}
+            ]
+        );
+    }
+
+    const showForegroundPermissionAlert = () => {
+        Alert.alert(
+            'Разрешения',
+            'Для полной работы приложения желательно разрешить отслеживание геолокации.',
+            [
+                { text: 'Не хочу', onPress: () => { } },
+                { text: 'Предоставить разрешение', onPress: () => Linking.openSettings() },
+            ]
+        );
+    };
+
+    const showBackgroundPermissionAlert = () => {
+        Alert.alert(
+            'Разрешения',
+            'Для полной работы приложения желательно разрешить доступ к геолокации в любое время.',
+            [
+                { text: 'Не хочу', onPress: () => { } },
+                { text: 'Предоставить разрешение', onPress: () => Linking.openSettings() },
+            ]
+        );
+    };
+
+    await checkLocationSetting();
+
+    return {
+        isForegroundGranted,
+        isBackgroundGranted,
+        isLocationEnabled
+    };
 }

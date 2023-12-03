@@ -148,7 +148,7 @@ export class DatabaseService {
 
             this.db.transaction(tx => {
                 tx.executeSql(
-                    `CREATE TABLE IF NOT EXISTS event (
+                    `CREATE TABLE IF NOT EXISTS task (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         title TEXT,
                         description TEXT NULL,
@@ -279,10 +279,10 @@ export class DatabaseService {
                             `DELETE FROM ${tableName} WHERE id = ${id}`, 
                             [],
                             (_, result) => {
-                                resolve('Запись в Таблице event успешно удалена: ', result)
+                                resolve(`Запись в Таблице ${tableName} успешно удалена: ${result}`)
                             },
                             (_, error) => {
-                                reject('Ошибка удаления записи в Таблице event: ', error);
+                                reject(`Ошибка удаления записи в Таблице ${tableName}: ${error}`);
                             }
                         );
                     });
@@ -359,6 +359,23 @@ export class DatabaseService {
             });
         });
     }
+
+    async getAllTableNames() {
+        return new Promise((resolve, reject) => {
+            this.db.transaction(tx => {
+                tx.executeSql(
+                    `SELECT name FROM sqlite_master WHERE type='table';`,
+                    [],
+                    (_, result) => {
+                        resolve(result.rows);
+                    },
+                    (_, error) => {
+                        reject(`Ошибка получения названия всех таблиц: ${error}`);
+                    }
+                );
+            })
+        });
+    };
 }
 
 export class Category {
@@ -437,7 +454,7 @@ export class Activity {
     }
 }
 
-export class Event {
+export class Task {
     errors = {};
 
     constructor(data) {

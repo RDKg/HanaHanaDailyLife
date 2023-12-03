@@ -11,7 +11,7 @@ import * as utils from '../utils.js';
 import { openDB, DatabaseService } from '../data/databaseService.js';
 import { styles } from '../styles/styles.js';
 
-import { EventDetailsScreen, EventEditorScreen } from './EventsScreen.js';
+import { TaskDetailsScreen, TaskEditorScreen } from './TasksScreen.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -31,8 +31,8 @@ export const ProfileTabNavigator = ({ route }) => {
             }
         >
             <Stack.Screen name='HomeProfile' component={ProfileScreen} initialParams={{withGoBack}}/>
-            <Stack.Screen name='EventEditor' component={EventEditorScreen}/>
-            <Stack.Screen name='EventDetails' component={EventDetailsScreen}/>
+            <Stack.Screen name='TaskEditor' component={TaskEditorScreen}/>
+            <Stack.Screen name='TaskDetails' component={TaskDetailsScreen}/>
         </Stack.Navigator>
     )
 }
@@ -59,13 +59,13 @@ export const ProfileScreen = ({ navigation, route }) => {
     }, [route?.params?.isReload]);
 
     const fetchData = () => {
-        const events = [];
+        const tasks = [];
         
         Promise.all([
             dbService.getTableData('category'),
             dbService.getTableData('activity'),
             dbService.getTableData(
-                'event', 
+                'task', 
                 {orderBy: 'started_at', typeOrder: 'ASC'},
                 [
                     {field: 'started_at', comparison: '<=', value: currentDate.getTime(), logicalOperator: 'AND'},
@@ -73,7 +73,7 @@ export const ProfileScreen = ({ navigation, route }) => {
                 ]
             )
         ])
-        .then(([categoryResult, activityResult, eventsResult]) => {
+        .then(([categoryResult, activityResult, tasksResult]) => {
             const categories = categoryResult._array.map(item => ({
                 key: item.id,
                 value: item.title,
@@ -84,7 +84,7 @@ export const ProfileScreen = ({ navigation, route }) => {
                 key: item.id,
                 value: item.title
             }))
-            eventsResult._array.forEach((item) => {
+            tasksResult._array.forEach((item) => {
                 const date = new Date(item.started_at);
                 const formattedDate = utils.convertDateToStringFormat(date, {isHour: false, isMinute: false});
                 const data = {
@@ -97,30 +97,30 @@ export const ProfileScreen = ({ navigation, route }) => {
                     }]
                 };
                 
-                const existingItemIndex = events.findIndex((findIndex) => findIndex.title == formattedDate);
+                const existingItemIndex = tasks.findIndex((findIndex) => findIndex.title == formattedDate);
 
                 if (existingItemIndex !== -1) {
-                    events[existingItemIndex].data.push(data.data[0])
+                    tasks[existingItemIndex].data.push(data.data[0])
                 } 
                 else {
-                    events.push(data);
+                    tasks.push(data);
                 }
             });
 
-            if (eventsResult._array.length === 0) {
+            if (tasksResult._array.length === 0) {
                 setTitle('У вас нет ниодной активной задачи! :(');
             }
-            else if (eventsResult._array.length === 1) {
+            else if (tasksResult._array.length === 1) {
                 setTitle('У вас есть одна активная задача! :)');
             }
             else {
-                setTitle(`У вас ${eventsResult._array.length} активных задач! :#`);
+                setTitle(`У вас ${tasksResult._array.length} активных задач! :#`);
             }
 
             setData({
                 categories,
                 activities,
-                events
+                tasks
             });
             setIsDataLoaded(true);
         });
@@ -218,16 +218,16 @@ export const ProfileScreen = ({ navigation, route }) => {
                     }
                 >
                     <View style={{...styles.mainContainerDefault}}>
-                        <components.EventButton
-                            onPress={() => navigation.navigate('EventEditor', {withGoBack: true, prevScreenName: 'HomeProfile'})}
-                            AvatarComponent={constants.avatars.PlusEventAvatar}
+                        <components.TaskButton
+                            onPress={() => navigation.navigate('TaskEditor', {withGoBack: true, prevScreenName: 'HomeProfile'})}
+                            AvatarComponent={constants.avatars.PlusTaskAvatar}
                             title={'Добавить новый план'}
                         />
                         {
-                            data?.events &&
-                            <components.EventsButtons
+                            data?.tasks &&
+                            <components.TasksButtons
                                 currentScreenName='HomeProfile'
-                                data={data?.events}
+                                data={data?.tasks}
                                 navigation={navigation}
                             />
                         }
