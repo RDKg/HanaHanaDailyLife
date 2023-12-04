@@ -469,7 +469,7 @@ export const ToggleBox = ({
                 alignItems: 'center'
             }}
         >
-            <Text style={{...styles.boxTitleText, fontSize: 16}}>{title}</Text>
+            <Text style={{...styles.boxTitleText, fontSize: 16, flexShrink: 1, textAlign: 'right'}}>{title}</Text>
             <TouchableHighlight
                 onPress={!isActive ? () => {} : onPress}
                 underlayColor={utils.convertColorDataToString(constants.whiteColor)}
@@ -512,7 +512,8 @@ export const CustomButton = ({
     onPress,
     textColor=utils.convertColorDataToString(constants.whiteColor),
     backgroundColor=utils.convertColorDataToString(constants.greenColor),
-    underlayColor=utils.convertColorDataToString(constants.blackColor)
+    underlayColor=utils.convertColorDataToString(constants.blackColor),
+    style,
 }) => {
     return (
         <TouchableHighlight
@@ -522,7 +523,8 @@ export const CustomButton = ({
                 ...styles.defaultBox,
                 ...styles.dropShadow,
                 backgroundColor: backgroundColor,
-                padding: constants.padding
+                padding: constants.padding,
+                ...style
             }}
         >
             <Text

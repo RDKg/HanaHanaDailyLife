@@ -24,16 +24,10 @@ const Tab = createBottomTabNavigator();
 
 const db = openDB('HanaHanaDailyLife.db');
 const dbService = new DatabaseService(db);
-// dbService.getAllTableNames().then(result => {
-//     result._array.forEach(item => {
-//         console.log(item)
-//         dbService.dropTableData(item.name) 
-//     })
-// }) 
-dbService.createAndInsertDefaultData();  
 
-SplashScreen.preventAutoHideAsync();
+dbService.createAndInsertDefaultData();  
 NotificationsService.registerForPushNotifications(); 
+SplashScreen.preventAutoHideAsync();
 
 export default function App() {
     const [fontsLoaded] = Font.useFonts(constants.fontFiles);
@@ -135,3 +129,10 @@ export default function App() {
         </NavigationContainer>
     );
 }
+
+// dbService.getAllTableNames().then(result => {
+//     result._array.forEach(item => {
+//         console.log(item)
+//         dbService.dropTableData(item.name) 
+//     })
+// }) 

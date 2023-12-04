@@ -72,7 +72,8 @@ export const AboutScreen = ({ navigation, route }) => {
                                             borderTopLeftRadius: 0,
                                         }}
                                     >
-                                        {activeComponents.includes(key) ? 
+                                        {
+                                            activeComponents.includes(key) ?
                                             <Text style={{...styles.defaultTextSentences, textAlign: 'justify'}}>{aboutJsonData[key]['description']}</Text> :
                                             <Text style={{...styles.defaultTextSentences, textAlign: 'center', fontSize: 10}}>НАЖМИ, ЧТОБЫ ПОСМОТРЕТЬ</Text>
                                         }
