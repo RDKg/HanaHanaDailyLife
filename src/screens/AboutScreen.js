@@ -11,7 +11,7 @@ import aboutJsonData from '../contents/about.json';
 export const AboutScreen = ({ navigation, route }) => {
     const withGoBack = route?.params?.withGoBack;
 
-    const [activeComponents, changeActiveComponents] = useState([]);
+    const [activeComponents, setActiveComponents] = useState([]);
 
     const handleActiveComponents = useCallback((key) => {
         let newActiveComponents;
@@ -27,9 +27,9 @@ export const AboutScreen = ({ navigation, route }) => {
             newActiveComponents = [...activeComponents, key];
         }
     
-        changeActiveComponents(newActiveComponents);
+        setActiveComponents(newActiveComponents);
     }, [activeComponents]);
-
+    
     return (
         <View style={styles.mainContainer}>
             <components.BackgroundComponent/>
@@ -45,13 +45,7 @@ export const AboutScreen = ({ navigation, route }) => {
                     >
                         {
                             Object.keys(aboutJsonData).map(key => (
-                                <View 
-                                    key={key} 
-                                    style={{
-                                        width: '100%', 
-                                        position: 'relative',
-                                    }}
-                                >
+                                <View key={key} style={{width: '100%', position: 'relative'}}>
                                     <TouchableHighlight
                                         onPress={() => handleActiveComponents(key)} 
                                         underlayColor={utils.convertColorDataToString(constants.grayColor)}

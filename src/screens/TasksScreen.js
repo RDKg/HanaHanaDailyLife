@@ -220,6 +220,7 @@ export const TaskEditorScreen = ({navigation, route}) => {
 
     const [isMapEnabled, setIsMapEnabled] = useState(false);
     const [isRouteFollowing, setIsRouteFollowing] = useState(false);
+    const [isCheckingLocationSettings, setIsCheckingLocationSettings] = useState(true);
 
     const [showingStartDateTimePicker, setShowingStartDateTimePicker] = useState();
     const [formattedStartDateText, setFormattedStartDateText] = useState();
@@ -360,23 +361,22 @@ export const TaskEditorScreen = ({navigation, route}) => {
 
     // Проверка включенной геолокации и разрешений на нее
     useEffect(() => {
-        utils.checkLocation()
-        .then(({ isBackgroundGranted, isForegroundGranted, isLocationEnabled }) => {
-            setLocationSettingsData({
-                isForegroundGranted,
-                isBackgroundGranted,
-                isLocationEnabled
-            });
-
-            if (isLocationEnabled) {
-                setIsMapEnabled(true);
-            }
-
-            if (isBackgroundGranted) {
+        if (isCheckingLocationSettings === true) {
+            utils.checkLocation()
+            .then(({ isBackgroundGranted, isForegroundGranted, isLocationEnabled }) => {
+                setLocationSettingsData({
+                    isForegroundGranted,
+                    isBackgroundGranted,
+                    isLocationEnabled
+                });
+    
+                setIsMapEnabled(isLocationEnabled);
                 setIsRouteFollowing(isBackgroundGranted);
-            }
-        });
-    }, []);
+            });
+    
+            setIsCheckingLocationSettings(false);
+        }
+    }, [isCheckingLocationSettings]);
 
     // Если были переданы данные об ивенте, то устанавливаем их
     useEffect(() => {
@@ -479,7 +479,12 @@ export const TaskEditorScreen = ({navigation, route}) => {
             const interval = setInterval(() => {
                 utils.getCurrentLocation()
                 .then(result => {
-                    setCurrentLocation(result);
+                    if (result) {
+                        setCurrentLocation(result);
+                    }
+                    else {
+                        setIsCheckingLocationSettings(true);
+                    }
                 });
             }, currentLocation ? 10000 : 0);
     

@@ -37,7 +37,7 @@ export class NotificationsService {
             return token;
         }
         catch (error) {
-            console.log('Пользователь не разрешил Push-уведомления!');
+            console.error('Пользователь не разрешил Push-уведомления!');
         }
     }
 

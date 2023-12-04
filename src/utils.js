@@ -271,9 +271,9 @@ export async function getCurrentLocation(
         };
     }
     catch (error) {
-        console.error('Ошибка получения текущей геолокации: ', error)
+        console.error(`Ошибка получения текущей геолокации: ${error}`);
 
-        return {}
+        return null;
     }
 }
 
