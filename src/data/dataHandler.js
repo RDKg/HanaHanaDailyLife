@@ -4,7 +4,7 @@ export class StorageHandler {
     static async getStorageItem(key) {
         try {
             const value = await AsyncStorage.getItem(key);
-    
+
             return value;
         }
         catch (error) {
