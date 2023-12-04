@@ -366,7 +366,15 @@ export const TaskEditorScreen = ({navigation, route}) => {
                 isForegroundGranted,
                 isBackgroundGranted,
                 isLocationEnabled
-            })
+            });
+
+            if (isLocationEnabled) {
+                setIsMapEnabled(true);
+            }
+
+            if (isBackgroundGranted) {
+                setIsRouteFollowing(isBackgroundGranted);
+            }
         });
     }, []);
 
