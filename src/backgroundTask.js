@@ -4,6 +4,7 @@ import { Platform } from 'react-native';
 import * as TaskManager from 'expo-task-manager';
 import * as Notifications from 'expo-notifications';
 
+import { StorageHandler } from './data/dataHandler';
 import { openDB, DatabaseService } from './data/databaseService';
 
 const db = openDB('HanaHanaDailyLife.db');
@@ -42,9 +43,11 @@ export class NotificationsService {
     }
 
     static async scheduleStartTaskNotification(taskData) {
-        if (true) {
+        const isStartEnabled = await StorageHandler.getStorageItem('isTaskStartNotificationsEnabled') == 'true';
+
+        if (isStartEnabled) {
             await this.scheduleTaskNotification(
-                'start_' + taskData.id, 
+                'start' + taskData.id, 
                 taskData.title, 
                 'Пришло время выполнять задачу!', 
                 new Date(taskData.started_at)
@@ -53,16 +56,28 @@ export class NotificationsService {
     };
 
     static async scheduleEndTaskNotification(taskData) {
-        if (true) {
+        const isEndEnabled = await StorageHandler.getStorageItem('isTaskEndNotificationsEnabled') == 'true';
+
+        if (isEndEnabled) {
             await this.scheduleTaskNotification(
-                'end_' + taskData.id, 
+                'end' + taskData.id, 
                 taskData.title, 
                 'Посмотрие на результат завершенной задачи!', 
                 new Date(taskData.ended_at)
             );
         }
     };
-    
+
+    static async cancelAllScheduledTasksNotifications(type) {
+        const notifications = await Notifications.getAllScheduledNotificationsAsync();
+
+        notifications.forEach(item => {
+            if (item.identifier.includes(type)) {
+                Notifications.cancelScheduledNotificationAsync(item.identifier);
+            }
+        });
+    }
+
     static async scheduleTaskNotification(id, title, description, date) {
         await Notifications.scheduleNotificationAsync({
             content: {
@@ -76,7 +91,7 @@ export class NotificationsService {
         });
     } 
 
-    static async cancelScheduleTaskNotification(id) {
+    static async cancelScheduledTaskNotification(id) {
         await Notifications.cancelScheduledNotificationAsync('start_' + id);
         await Notifications.cancelScheduledNotificationAsync('end_' + id);
     }

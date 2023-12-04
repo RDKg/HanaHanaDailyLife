@@ -53,18 +53,6 @@ export const TasksScreen = ({navigation, route}) => {
 
     const [requestDataCount, setRequestDataCount] = useState(itemsPerPage);
     const [data, setData] = useState();
- 
-    useEffect(() => {
-        onRefresh();
-    }, [isShowingCompleted]);
-
-    useEffect(() => {
-        if (route?.params?.isReload) {
-            onRefresh();
-        }
-
-        navigation.setParams({isReload: false})
-    }, [route?.params?.isReload]);
 
     const fetchData = () => {
         const tasks = [];
@@ -146,6 +134,18 @@ export const TasksScreen = ({navigation, route}) => {
             fetchData();
         }
     };
+
+    useEffect(() => {
+        onRefresh();
+    }, [isShowingCompleted]);
+
+    useEffect(() => {
+        if (route?.params?.isReload) {
+            onRefresh();
+        }
+
+        navigation.setParams({isReload: false})
+    }, [route?.params?.isReload]);
 
     return (
         <View style={styles.mainContainer}>
@@ -302,9 +302,11 @@ export const TaskEditorScreen = ({navigation, route}) => {
         setValidationErrors(taskValidation.errors);
 
         if (Object.keys(taskValidation.errors).length === 0) {
-            dbService.insertData('task', newTaskData);
-            NotificationsService.scheduleStartTaskNotification(newTaskData);
-            NotificationsService.scheduleEndTaskNotification(newTaskData);
+            dbService.insertData('task', newTaskData)
+            .then(result => {
+                NotificationsService.scheduleStartTaskNotification({...newTaskData, id: result});
+                NotificationsService.scheduleEndTaskNotification({...newTaskData, id: result});
+            });
             navigation.navigate(prevScreenName, {isReload: true});
         }
     } 
@@ -331,7 +333,7 @@ export const TaskEditorScreen = ({navigation, route}) => {
         }
         else if (Object.keys(taskValidation.errors).length === 0) {
             dbService.updateData('task', newTaskData);
-            NotificationsService.cancelScheduleTaskNotification(newTaskData.id);
+            NotificationsService.cancelScheduledTaskNotification(newTaskData.id);
             NotificationsService.scheduleStartTaskNotification(newTaskData);
             NotificationsService.scheduleEndTaskNotification(newTaskData);
             navigation.navigate(prevScreenName, {isReload: true});
@@ -347,7 +349,7 @@ export const TaskEditorScreen = ({navigation, route}) => {
                     text: 'ДА',
                     onPress: () => {
                         dbService.deleteData('task', taskData.id);
-                        NotificationsService.cancelScheduleTaskNotification(taskData.id);
+                        NotificationsService.cancelScheduledTaskNotification(taskData.id);
                         navigation.navigate(prevScreenName, {isReload: true});
                     },
                 },
@@ -773,7 +775,7 @@ export const TaskDetailsScreen = ({navigation, route}) => {
                     text: 'ДА',
                     onPress: () => {
                         dbService.deleteData('task', taskData.id);
-                        NotificationsService.cancelScheduleTaskNotification(taskData.id);
+                        NotificationsService.cancelScheduledTaskNotification(taskData.id);
                         navigation.navigate(prevScreenName, {isReload: true});
                     },
                 },
@@ -795,7 +797,7 @@ export const TaskDetailsScreen = ({navigation, route}) => {
                         text: 'ДА',
                         onPress: () => {
                             dbService.updateData('task', {id: taskData.id, ended_at: currentDate.getTime()});
-                            NotificationsService.cancelScheduleTaskNotification(taskData.id);
+                            NotificationsService.cancelScheduledTaskNotification(taskData.id);
                             navigation.navigate(prevScreenName, {isReload: true});
                         },
                     },

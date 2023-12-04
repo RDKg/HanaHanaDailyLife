@@ -28,48 +28,6 @@ export class DatabaseService {
         this.db = db;
     }
 
-    async dropTableData(tableName) {
-        return new Promise((resolve, reject) => {
-            this.isTableCreated(tableName)
-            .then(result => {
-                if (result) {
-                    this.db.transaction(tx => {
-                        tx.executeSql(
-                            `DROP TABLE ${tableName};`, 
-                            [], 
-                            (_, result) => {
-                                resolve(`Таблица ${tableName} удалена.`)
-                            },
-                            (_, error) => {
-                                reject(error)
-                            }
-                        );
-                    });
-                }
-                else {
-                    reject(`Таблицы ${tableName} не существует.`);
-                }
-            });
-        })
-    }
-
-    async isTableCreated(tableName) {
-        return new Promise((resolve, reject) => {
-            this.db.transaction(tx => {
-                tx.executeSql(
-                    `SELECT name FROM sqlite_master WHERE type='table' AND name=?;`,
-                    [tableName],
-                    (_, result) => {
-                        resolve(result.rows.length != 0);
-                    },
-                    (_, error) => {
-                        reject(error);
-                    }
-                )
-            });
-        });
-    }
-
     async createAndInsertDefaultData() {
         return new Promise((resolve, reject) => {
             const isCreated = async () => {
@@ -136,7 +94,7 @@ export class DatabaseService {
                                 resolve(true);
                             },
                             (_, error) => {
-                                reject(error);
+                                reject(`Произошла ошибка во время добавления записи в category: ${error}`);
                             }
                         );
                     });
@@ -174,6 +132,48 @@ export class DatabaseService {
         })
     } 
 
+    async dropTableData(tableName) {
+        return new Promise((resolve, reject) => {
+            this.isTableCreated(tableName)
+            .then(result => {
+                if (result) {
+                    this.db.transaction(tx => {
+                        tx.executeSql(
+                            `DROP TABLE ${tableName};`, 
+                            [], 
+                            (_, result) => {
+                                resolve(`Таблица ${tableName} удалена.`)
+                            },
+                            (_, error) => {
+                                reject(error)
+                            }
+                        );
+                    });
+                }
+                else {
+                    reject(`Таблицы ${tableName} не существует.`);
+                }
+            });
+        })
+    }
+
+    async isTableCreated(tableName) {
+        return new Promise((resolve, reject) => {
+            this.db.transaction(tx => {
+                tx.executeSql(
+                    `SELECT name FROM sqlite_master WHERE type='table' AND name=?;`,
+                    [tableName],
+                    (_, result) => {
+                        resolve(result.rows.length != 0);
+                    },
+                    (_, error) => {
+                        reject(error);
+                    }
+                )
+            });
+        });
+    }
+
     async getTableData(tableName, order={}, condition={}, count={}) {
         const { orderBy, typeOrder } = order;
         const { limit, offset } = count
@@ -197,7 +197,7 @@ export class DatabaseService {
                 conditionString += `${field + ' ' + comparison + ' ' + value}`;
             
                 if (index !== array.length - 1) {
-                    conditionString += logicalOperator ? ' ' + logicalOperator + ' ': ' AND ';
+                    conditionString += logicalOperator ? ' ' + logicalOperator + ' ' : ' AND ';
                 }
             })
         }
@@ -309,7 +309,7 @@ export class DatabaseService {
                             insertQuery, 
                             values,
                             (_, result) => {
-                                resolve(`Запись в Таблицу ${tableName} успешно добавлена: ${result}`)
+                                resolve(result.insertId);
                             },
                             (_, error) => {
                                 reject(`Ошибка добавления записи в Таблицу ${tableName}: ${error}`);

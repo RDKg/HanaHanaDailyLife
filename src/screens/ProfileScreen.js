@@ -8,6 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as constants from '../styles/constants.js';
 import * as components from '../components.js';
 import * as utils from '../utils.js';
+import { StorageHandler } from '../data/dataHandler.js';
 import { openDB, DatabaseService } from '../data/databaseService.js';
 import { styles } from '../styles/styles.js';
 
@@ -42,6 +43,8 @@ export const ProfileScreen = ({ navigation, route }) => {
     const currentDate = new Date();
     const itemsPerPage = 10;
     
+    const [username, setUsername] = useState();
+
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [isDataLoaded, setIsDataLoaded] = useState(false);
 
@@ -71,9 +74,10 @@ export const ProfileScreen = ({ navigation, route }) => {
                     {field: 'started_at', comparison: '<=', value: currentDate.getTime(), logicalOperator: 'AND'},
                     {field: 'ended_at', comparison: '>=', value: currentDate.getTime()}
                 ]
-            )
+            ),
+            StorageHandler.getStorageItem('username')
         ])
-        .then(([categoryResult, activityResult, tasksResult]) => {
+        .then(([categoryResult, activityResult, tasksResult, usernameResult]) => {
             const categories = categoryResult._array.map(item => ({
                 key: item.id,
                 value: item.title,
@@ -123,6 +127,7 @@ export const ProfileScreen = ({ navigation, route }) => {
                 tasks
             });
             setIsDataLoaded(true);
+            setUsername(usernameResult);
         });
     };
 
@@ -184,7 +189,7 @@ export const ProfileScreen = ({ navigation, route }) => {
                                 bottom: -2,
                                 transform: [{rotate: '30deg'}]
                             }}/>
-                            <Text style={{...styles.defaultTextSentences, fontSize: 16}}>Ваш профиль</Text>
+                            <Text style={{...styles.defaultTextSentences, fontSize: 16}}>{username}</Text>
                         </View>
                     </View>
                     <View 

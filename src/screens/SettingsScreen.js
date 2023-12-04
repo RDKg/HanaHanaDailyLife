@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, View, RefreshControl, TextInput, ImageBackground, ScrollView } from 'react-native';
-import { Line, Svg } from 'react-native-svg';
 
 import * as constants from '../styles/constants.js';
 import * as components from '../components.js';
 import * as utils from '../utils.js';
 import { StorageHandler } from '../data/dataHandler.js';
+import { openDB, DatabaseService } from '../data/databaseService.js';
 import { styles } from '../styles/styles.js';
+import { NotificationsService } from '../backgroundTask.js';
+
+const db = openDB('HanaHanaDailyLife.db');
+const dbService = new DatabaseService(db);
 
 export const SettingsScreen = ({ navigation, route }) => {
     const withGoBack = route?.params?.withGoBack;
+    const currentDate = new Date();
 
     const [username, setUsername] = useState();
     
@@ -31,6 +36,27 @@ export const SettingsScreen = ({ navigation, route }) => {
         }
     }
 
+    const fetchTasksNotificationsData = async () => {
+        const tasksData = await dbService.getTableData(
+            'task',
+            [
+                {field: 'started_at', comparison: '>=', value: currentDate.getTime()},
+                {field: 'ended_at', comparison: '<=', value: currentDate.getTime()},
+            ]
+        )
+
+        const tasksNotificationsData = tasksData._array.map(item => {
+            return {
+                id: item.id,
+                title: item.title,
+                started_at: item.started_at,
+                ended_at: item.ended_at,
+            }
+        })
+
+        return tasksNotificationsData;
+    }
+ 
     const changeUsername = (value) => {
         setUsername(value);
     }
@@ -43,11 +69,35 @@ export const SettingsScreen = ({ navigation, route }) => {
         if (isDataLoaded) {
             StorageHandler.saveStorageItem('isTaskStartNotificationsEnabled', `${isTaskStartNotificationsEnabled}`);
         }
+
+        if (isTaskStartNotificationsEnabled) {
+            fetchTasksNotificationsData()
+            .then(result => {
+                result.forEach(item => {
+                    NotificationsService.scheduleStartTaskNotification(item);
+                })
+            })
+        }
+        else {
+            NotificationsService.cancelAllScheduledTasksNotifications('start');
+        }
     }, [isTaskStartNotificationsEnabled]);
 
     useEffect(() => {
         if (isDataLoaded) {
             StorageHandler.saveStorageItem('isTaskEndNotificationsEnabled', `${isTaskEndNotificationsEnabled}`);
+        }
+
+        if (isTaskEndNotificationsEnabled) {
+            fetchTasksNotificationsData()
+            .then(result => {
+                result.forEach(item => {
+                    NotificationsService.scheduleEndTaskNotification(item);
+                })
+            })
+        }
+        else {
+            NotificationsService.cancelAllScheduledTasksNotifications('end');
         }
     }, [isTaskEndNotificationsEnabled]);
 
