@@ -115,7 +115,8 @@ export const styles = StyleSheet.create({
         fontSize: 14,
         fontFamily: 'RalewayLight',
         color: utils.convertColorDataToString(constants.blackColor),
-        fontVariant: 'lining-nums'
+        fontVariant: 'lining-nums',
+        textAlign: 'center'
     },
     boxTitleText: {
         fontSize: 20,

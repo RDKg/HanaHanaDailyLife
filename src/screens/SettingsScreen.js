@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, RefreshControl, TextInput, ImageBackground, ScrollView } from 'react-native';
+import { SafeAreaView, View, RefreshControl, TextInput, ImageBackground, ScrollView, TouchableHighlight, Text } from 'react-native';
+
+import * as ImagePicker from 'expo-image-picker';
 
 import * as constants from '../styles/constants.js';
 import * as components from '../components.js';
@@ -150,8 +152,7 @@ export const SettingsScreen = ({ navigation, route }) => {
                                         ...styles.defaultBox, 
                                         ...styles.dropShadow,
                                         padding: constants.padding,
-                                        justifyContent: 'space-between',
-                                        flexDirection: 'row',
+                                        gap: constants.padding,
                                         width: '100%',
                                     }}
                                 >
@@ -159,15 +160,29 @@ export const SettingsScreen = ({ navigation, route }) => {
                                         style={{
                                             backgroundColor: utils.convertColorDataToString(constants.grayColor),
                                             borderRadius: constants.borderRadius,
-                                            width: 64,
-                                            height: 64
+                                            width: '100%',
+                                            aspectRatio: 1,
+                                            position: 'relative',
+                                            overflow: 'hidden'
                                         }}
                                     >
                                         <ImageBackground/>
+                                        <TouchableHighlight
+                                            onPress={() => {}}
+                                            underlayColor={utils.convertColorDataToString(constants.grayColor)}
+                                            style={{ 
+                                                backgroundColor: utils.convertColorDataToString(constants.blackColor),
+                                                height: 50,
+                                                width: '100%',
+                                                position: 'absolute',
+                                                bottom: 0,
+                                                opacity: 0.2,
+                                                justifyContent: 'center',
+                                            }}
+                                        >
+                                            <Text style={styles.hintText}>ИЗМЕНИТЬ ФОТОГРАФИЮ</Text>
+                                        </TouchableHighlight>
                                     </View>
-                                    <components.CustomButton 
-                                        title="Установить аватарку"
-                                    />
                                 </View>
                                 <View style={{position: 'relative', width: '100%'}}>
                                     <TextInput

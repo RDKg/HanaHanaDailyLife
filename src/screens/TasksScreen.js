@@ -184,7 +184,7 @@ export const TasksScreen = ({navigation, route}) => {
                     <View style={{...styles.mainContainerDefault}}>
                         <components.TaskButton
                             onPress={() => navigation.navigate('TaskEditor', {withGoBack: true, prevScreenName: 'HomeTask'})}
-                            AvatarComponent={constants.avatars.PlusTaskAvatar}
+                            AvatarComponent={constants.avatars.addTaskAvatar}
                             title={'Добавить новый план'}
                         />
                         {
@@ -371,11 +371,11 @@ export const TaskEditorScreen = ({navigation, route}) => {
                     isBackgroundGranted,
                     isLocationEnabled
                 });
-    
-                setIsMapEnabled(isLocationEnabled);
+                
+                setIsMapEnabled(isForegroundGranted);
                 setIsRouteFollowing(isBackgroundGranted);
             });
-    
+
             setIsCheckingLocationSettings(false);
         }
     }, [isCheckingLocationSettings]);
@@ -414,10 +414,14 @@ export const TaskEditorScreen = ({navigation, route}) => {
     // Получаем переданные данные, которые должны обновиться после получения данных из БД
     useEffect(() => {
         if (taskData && locationSettingsData.isForegroundGranted !== null) {
-            setIsMapEnabled(taskData?.is_map_enabled);
+            setIsMapEnabled(taskData?.is_map_enabled && locationSettingsData.isForegroundGranted);
         }
         if (taskData && locationSettingsData.isBackgroundGranted !== null) {
-            setIsRouteFollowing(taskData.is_route_following);
+            setIsRouteFollowing(
+                taskData?.is_map_enabled && 
+                locationSettingsData.isBackgroundGranted &&
+                taskData.is_route_following
+            );
         }
     }, [locationSettingsData]);
 
@@ -477,7 +481,7 @@ export const TaskEditorScreen = ({navigation, route}) => {
 
     // Получаем текущую геолокацию пользователя каждые 10 секунд
     useEffect(() => {
-        if (locationSettingsData.isLocationEnabled && isMapEnabled) {
+        if (locationSettingsData.isForegroundGranted && isMapEnabled) {
             const interval = setInterval(() => {
                 utils.getCurrentLocation()
                 .then(result => {
@@ -499,7 +503,7 @@ export const TaskEditorScreen = ({navigation, route}) => {
             <components.BackgroundComponent/>
             <components.GoBackButton onPress={() => navigation.goBack()} withGoBack={withGoBack}/>
             {
-                isMapEnabled && currentLocation ?
+                isMapEnabled && locationSettingsData.isForegroundGranted && currentLocation ?
                 <View
                     style={{
                         ...styles.defaultBox,
@@ -520,12 +524,7 @@ export const TaskEditorScreen = ({navigation, route}) => {
                         zoomControlEnabled={true}
                         showsUserLocation={true}
                         onLongPress={addLocationMarker}
-                        initialRegion={{
-                            latitude: currentLocation?.latitude,
-                            latitudeDelta: currentLocation?.latitudeDelta,
-                            longitude: currentLocation?.longitude,
-                            longitudeDelta: currentLocation?.longitudeDelta,
-                        }}
+                        initialRegion={currentLocation}
                     >
                         {
                             startLocation &&
@@ -701,16 +700,16 @@ export const TaskEditorScreen = ({navigation, route}) => {
                             <components.ToggleBox
                                 onPress={() => {setIsMapEnabled(!isMapEnabled)}}
                                 title='Использование карты'
-                                isChecked={!locationSettingsData.isLocationEnabled ? false : isMapEnabled}
-                                isActive={locationSettingsData.isLocationEnabled}
+                                isChecked={locationSettingsData.isForegroundGranted && isMapEnabled}
+                                isActive={locationSettingsData.isForegroundGranted && isMapEnabled}
                             />
                         </View>
                         <View style={{width: '100%', justifyContent: 'flex-end'}}>
                             <components.ToggleBox
                                 onPress={() => {setIsRouteFollowing(!isRouteFollowing)}}
                                 title='Отслеживание маршрута'
-                                isChecked={!locationSettingsData.isBackgroundGranted ? false : isRouteFollowing}
-                                isActive={!locationSettingsData.isBackgroundGranted ? false : isMapEnabled}
+                                isChecked={locationSettingsData.isBackgroundGranted && isRouteFollowing}
+                                isActive={locationSettingsData.isBackgroundGranted && isMapEnabled}
                             />
                         </View>
                         <View style={{

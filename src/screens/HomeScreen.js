@@ -11,16 +11,14 @@ import { styles } from '../styles/styles.js';
 
 import { AboutScreen } from './AboutScreen.js';
 import { TaskTabNavigator } from './TasksScreen.js';
-import { MessengerScreen } from './MessengerScreen.js';
 import { ProfileTabNavigator } from './ProfileScreen.js';
 import { SettingsScreen } from './SettingsScreen.js';
 import { StatsScreen } from './StatsScreen.js';
-import { UsersScreen } from './UsersScreen.js';
 
 import BackgroundProfileButton from '../../assets/img/background-profile-button.svg';
 import BackgroundSettingsButton from '../../assets/img/background-settings-button.svg';
-import BackgroundMessengerButton from '../../assets/img/background-messenger-button.svg';
-import VectorMessengerButton from '../../assets/img/vector-messenger-button.svg';
+import BackgroundTasksButton from '../../assets/img/background-tasks-button.svg';
+import VectorTasksButton from '../../assets/img/vector-tasks-button.svg';
 
 const Stack = createNativeStackNavigator();
 
@@ -37,10 +35,8 @@ export const HomeTabNavigator = () => {
             <Stack.Screen name='Home' component={HomeScreen}/>
             <Stack.Screen name='Profile' component={ProfileTabNavigator}/>
             <Stack.Screen name='Settings' component={SettingsScreen}/>
-            <Stack.Screen name='Messenger' component={MessengerScreen}/>
             <Stack.Screen name='Tasks' component={TaskTabNavigator} initialParams={{withGoBack: true}}/>
             <Stack.Screen name='Stats' component={StatsScreen}/>
-            <Stack.Screen name='Users' component={UsersScreen}/>
             <Stack.Screen name='About' component={AboutScreen}/>
         </Stack.Navigator>
     )
@@ -131,17 +127,16 @@ export const HomeScreen = ({navigation}) => {
                             </>
                         </TouchableHighlight>
                         <TouchableHighlight 
-                            // onPress={() => navigation.navigate('Messenger', {withGoBack: true})} 
-                            // underlayColor={utils.convertColorDataToString(constants.grayColor)}
+                            onPress={() => navigation.navigate('Tasks', {withGoBack: true})} 
+                            underlayColor={utils.convertColorDataToString(constants.grayColor)}
                             style={{
                                 ...styles.defaultBox, 
                                 ...styles.dropShadow, 
                                 flex: 1,
-                                opacity: 0.65,
                             }
                         }>
                             <>
-                                <VectorMessengerButton style={{
+                                <VectorTasksButton style={{
                                     position: 'absolute',
                                     zIndex: 1, 
                                     bottom: -25,
@@ -152,7 +147,7 @@ export const HomeScreen = ({navigation}) => {
                                     locations={[0, 1]}
                                     style={{...styles.gradient, opacity: 0.5}}
                                 />
-                                <BackgroundMessengerButton style={{
+                                <BackgroundTasksButton style={{
                                     position: 'absolute',
                                     zIndex: -1, 
                                     resizeMode: 'cover' 
@@ -161,23 +156,12 @@ export const HomeScreen = ({navigation}) => {
                                     ...styles.defaultTextButton, 
                                     fontSize: 20, 
                                     color: utils.convertColorDataToString(constants.whiteColor)
-                                }}>МЕССЕНДЖЕР</Text>
+                                }}>ПЛАНЫ</Text>
                             </>
                         </TouchableHighlight>
                     </View>
                 </View>
                 <View style={{gap: constants.margin}}>
-                    <TouchableHighlight 
-                        onPress={() => navigation.navigate('Tasks', {withGoBack: true})} 
-                        underlayColor={utils.convertColorDataToString(constants.grayColor)}
-                        style={{
-                            ...styles.defaultBox, 
-                            ...styles.dropShadow, 
-                            padding: constants.padding
-                        }
-                    }>
-                        <Text style={styles.defaultTextButton}>УПРАВЛЕНИЕ ПЛАНАМИ</Text>
-                    </TouchableHighlight>
                     <TouchableHighlight 
                         onPress={() => navigation.navigate('Stats', {withGoBack: true})} 
                         underlayColor={utils.convertColorDataToString(constants.grayColor)}
@@ -188,18 +172,6 @@ export const HomeScreen = ({navigation}) => {
                         }
                     }>
                         <Text style={styles.defaultTextButton}>СТАТИСТИКА</Text>
-                    </TouchableHighlight>
-                    <TouchableHighlight 
-                        // onPress={() => navigation.navigate('Users', {withGoBack: true})} 
-                        // underlayColor={utils.convertColorDataToString(constants.grayColor)}
-                        style={{
-                            ...styles.defaultBox, 
-                            ...styles.dropShadow, 
-                            padding: constants.padding,
-                            opacity: 0.65,
-                        }
-                    }>
-                        <Text style={styles.defaultTextButton}>ПОЛЬЗОВАТЕЛИ</Text>
                     </TouchableHighlight>
                     <TouchableHighlight 
                         onPress={() => navigation.navigate('About', {withGoBack: true})} 

@@ -1,9 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { SafeAreaView, Text, View, RefreshControl, ImageBackground, ScrollView } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Line, Svg } from 'react-native-svg';
-
-import { LinearGradient } from 'expo-linear-gradient';
 
 import * as constants from '../styles/constants.js';
 import * as components from '../components.js';

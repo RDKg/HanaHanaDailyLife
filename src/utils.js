@@ -287,7 +287,8 @@ export async function checkLocation() {
 
         if (!isLocationEnabled) {
             showLocationSettingAlert();
-        } else {
+        } 
+        else {
             await checkForegroundPermission();
         }
     };
@@ -297,7 +298,8 @@ export async function checkLocation() {
 
         if (!isForegroundGranted) {
             showForegroundPermissionAlert();
-        } else {
+        } 
+        else {
             await checkBackgroundPermission();
         }
     };

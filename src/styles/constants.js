@@ -16,7 +16,7 @@ import studyTaskAvatar from '../../assets/ico/tasks/study-task-avatar.svg';
 import taskTaskAvatar from '../../assets/ico/tasks/task-task-avatar.svg';
 import walkTaskAvatar from '../../assets/ico/tasks/walk-task-avatar.svg';
 import workTaskAvatar from '../../assets/ico/tasks/work-task-avatar.svg';
-import PlusTaskAvatar from '../../assets/ico/tasks/add-task-avatar.svg'
+import addTaskAvatar from '../../assets/ico/tasks/add-task-avatar.svg';
 
 export const fontFiles = {
     RalewayThin: require('../../assets/fonts/Raleway-Thin.ttf'),
@@ -49,7 +49,7 @@ export const avatars = {
     taskTaskAvatar,
     walkTaskAvatar,
     workTaskAvatar,
-    PlusTaskAvatar,
+    addTaskAvatar,
 };
 
 export const defaultCategories = {
