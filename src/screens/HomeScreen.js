@@ -4,10 +4,10 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { LinearGradient } from 'expo-linear-gradient';
 
-import * as constants from '../styles/constants.js';
+import * as constants from '../constants.js';
 import * as components from '../components.js';
 import * as utils from '../utils.js';
-import { styles } from '../styles/styles.js'; 
+import { styles } from '../styles.js'; 
 
 import { AboutScreen } from './AboutScreen.js';
 import { TaskTabNavigator } from './TasksScreen.js';
@@ -44,22 +44,22 @@ export const HomeTabNavigator = () => {
 
 export const HomeScreen = ({navigation}) => {
     const { width } = useWindowDimensions(); 
-    const heightForSquareProfileButton = (width - constants.margin - constants.padding) / 2;
+    const heightForSquareProfileButton = (width - constants.MARGIN - constants.PADDING) / 2;
 
     return (
         <View style={styles.mainContainer}>
-            <components.BackgroundComponent/>
-            <SafeAreaView style={{...styles.mainRestrictor, ...styles.marginVertical, gap: constants.margin}}>
+            <components.BackgroundImage/>
+            <SafeAreaView style={{...styles.mainRestrictor, ...styles.marginVertical, gap: constants.MARGIN}}>
                 <View 
                     style={{ 
                         alignItems: 'stretch',
                         flexDirection: 'row',
-                        gap: constants.margin,
+                        gap: constants.MARGIN,
                         maxHeight: heightForSquareProfileButton
                     }}>
                     <TouchableHighlight 
                         onPress={() => navigation.navigate('Profile', {withGoBack: true})} 
-                        underlayColor={utils.convertColorDataToString(constants.grayColor)}
+                        underlayColor={utils.convertColorDataToString(constants.GRAY_COLOR)}
                         style={
                             {
                                 ...styles.defaultBox, 
@@ -86,7 +86,7 @@ export const HomeScreen = ({navigation}) => {
                                 style={{
                                     ...styles.defaultTextButton, 
                                     fontSize: 20, 
-                                    color: utils.convertColorDataToString(constants.whiteColor),
+                                    color: utils.convertColorDataToString(constants.WHITE_COLOR),
                                     position: 'absolute',
                                     bottom: 30,
                                     left: 15,
@@ -94,10 +94,10 @@ export const HomeScreen = ({navigation}) => {
                             >МОЙ{'\n'}ПРОФИЛЬ</Text>
                         </>
                     </TouchableHighlight>
-                    <View style={{flex: 1, gap: constants.margin}}>
+                    <View style={{flex: 1, gap: constants.MARGIN}}>
                         <TouchableHighlight 
                             onPress={() => navigation.navigate('Settings', {withGoBack: true})} 
-                            underlayColor={utils.convertColorDataToString(constants.grayColor)}
+                            underlayColor={utils.convertColorDataToString(constants.GRAY_COLOR)}
                             style={{
                                 ...styles.defaultBox, 
                                 ...styles.dropShadow, 
@@ -115,20 +115,20 @@ export const HomeScreen = ({navigation}) => {
                                     resizeMode: 'cover'
                                 }} width={'100%'}/>
                                 <LinearGradient
-                                    colors={constants.pinkToPurpleLightGradient.colors}
+                                    colors={constants.PINK_TO_PURPLE_LIGHT_GRADIENT.colors}
                                     locations={[0, 1]}
                                     style={{...styles.gradient, opacity: 0.5}}
                                 />
                                 <Text style={{
                                     ...styles.defaultTextButton, 
                                     fontSize: 20, 
-                                    color: utils.convertColorDataToString(constants.whiteColor)
+                                    color: utils.convertColorDataToString(constants.WHITE_COLOR)
                                 }}>НАСТРОЙКИ</Text>                                
                             </>
                         </TouchableHighlight>
                         <TouchableHighlight 
                             onPress={() => navigation.navigate('Tasks', {withGoBack: true})} 
-                            underlayColor={utils.convertColorDataToString(constants.grayColor)}
+                            underlayColor={utils.convertColorDataToString(constants.GRAY_COLOR)}
                             style={{
                                 ...styles.defaultBox, 
                                 ...styles.dropShadow, 
@@ -143,7 +143,7 @@ export const HomeScreen = ({navigation}) => {
                                     resizeMode: 'cover' 
                                 }} width={'100%'}/>  
                                 <LinearGradient
-                                    colors={constants.pinkToPurpleLightGradient.colors}
+                                    colors={constants.PINK_TO_PURPLE_LIGHT_GRADIENT.colors}
                                     locations={[0, 1]}
                                     style={{...styles.gradient, opacity: 0.5}}
                                 />
@@ -155,31 +155,31 @@ export const HomeScreen = ({navigation}) => {
                                 <Text style={{
                                     ...styles.defaultTextButton, 
                                     fontSize: 20, 
-                                    color: utils.convertColorDataToString(constants.whiteColor)
+                                    color: utils.convertColorDataToString(constants.WHITE_COLOR)
                                 }}>ПЛАНЫ</Text>
                             </>
                         </TouchableHighlight>
                     </View>
                 </View>
-                <View style={{gap: constants.margin}}>
+                <View style={{gap: constants.MARGIN}}>
                     <TouchableHighlight 
                         onPress={() => navigation.navigate('Stats', {withGoBack: true})} 
-                        underlayColor={utils.convertColorDataToString(constants.grayColor)}
+                        underlayColor={utils.convertColorDataToString(constants.GRAY_COLOR)}
                         style={{
                             ...styles.defaultBox, 
                             ...styles.dropShadow, 
-                            padding: constants.padding
+                            padding: constants.PADDING
                         }
                     }>
                         <Text style={styles.defaultTextButton}>СТАТИСТИКА</Text>
                     </TouchableHighlight>
                     <TouchableHighlight 
                         onPress={() => navigation.navigate('About', {withGoBack: true})} 
-                        underlayColor={utils.convertColorDataToString(constants.grayColor)}
+                        underlayColor={utils.convertColorDataToString(constants.GRAY_COLOR)}
                         style={{
                             ...styles.defaultBox, 
                             ...styles.dropShadow, 
-                            padding: constants.padding
+                            padding: constants.PADDING
                         }
                     }>
                         <Text style={styles.defaultTextButton}>О ПРИЛОЖЕНИИ</Text>

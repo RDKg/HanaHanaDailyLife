@@ -2,19 +2,19 @@ import React, { useState, useRef, useEffect } from 'react';
 import { SafeAreaView, Text, View, RefreshControl, ImageBackground, ScrollView } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import * as constants from '../styles/constants.js';
+import * as constants from '../constants.js';
 import * as components from '../components.js';
 import * as utils from '../utils.js';
-import { StorageHandler } from '../data/dataHandler.js';
-import { openDB, DatabaseService } from '../data/databaseService.js';
-import { styles } from '../styles/styles.js';
+import { LocalStorageHandler } from '../data/localStorageHandler.js';
+import { DatabaseHandler } from '../data/dbHandler.js';
+import { styles } from '../styles.js';
 
 import { TaskDetailsScreen, TaskEditorScreen } from './TasksScreen.js';
 
 const Stack = createNativeStackNavigator();
 
-const db = openDB('HanaHanaDailyLife.db');
-const dbService = new DatabaseService(db);
+const db = DatabaseHandler.openDb('HanaHanaDailyLife.db');
+const dbService = new DatabaseHandler(db);
 
 export const ProfileTabNavigator = ({ route }) => {
     const withGoBack = route?.params?.withGoBack;
@@ -72,7 +72,7 @@ export const ProfileScreen = ({ navigation, route }) => {
                     {field: 'ended_at', comparison: '>=', value: currentDate.getTime()}
                 ]
             ),
-            StorageHandler.getStorageItem('username')
+            LocalStorageHandler.getStorageItem('username')
         ])
         .then(([categoryResult, activityResult, tasksResult, usernameResult]) => {
             const categories = categoryResult._array.map(item => ({
@@ -150,11 +150,14 @@ export const ProfileScreen = ({ navigation, route }) => {
 
     return (
         <View style={styles.mainContainer}>
-            <components.BackgroundProfileComponent/>
-            <components.GoBackButton onPress={() => navigation.goBack()} withGoBack={withGoBack}/>
-            <SafeAreaView style={{gap: constants.margin, position: 'relative', flex: 1}}>
+            <components.BackgroundImageProfile/>
+            { 
+                withGoBack &&
+                <components.NavigatePreviousScreenButton onPress={() => navigation.goBack()}/>
+            }
+            <SafeAreaView style={{gap: constants.MARGIN, position: 'relative', flex: 1}}>
                 <View style={{...styles.mainContainerDefault}}>
-                    <View style={{gap: constants.margin, width: '100%'}}>
+                    <View style={{gap: constants.MARGIN, width: '100%'}}>
                         <View style={{
                             ...styles.defaultBox,
                             ...styles.dropShadow,
@@ -193,8 +196,8 @@ export const ProfileScreen = ({ navigation, route }) => {
                         width={64} 
                         height={64} 
                         style={{
-                            backgroundColor: utils.convertColorDataToString(constants.whiteColor),
-                            borderRadius: constants.borderRadius,
+                            backgroundColor: utils.convertColorDataToString(constants.WHITE_COLOR),
+                            borderRadius: constants.BORDER_RADIUS,
                         }}
                     >
                         <ImageBackground/>
@@ -203,7 +206,7 @@ export const ProfileScreen = ({ navigation, route }) => {
                             ...styles.screenTitleText,
                             width: '80%',
                             textAlign: 'center',
-                            paddingTop: constants.padding*2
+                            paddingTop: constants.PADDING*2
                         }}
                     >{title}</Text>
                 </View>
@@ -215,14 +218,14 @@ export const ProfileScreen = ({ navigation, route }) => {
                         <RefreshControl
                             refreshing={isRefreshing}
                             onRefresh={onRefresh}
-                            colors={[utils.convertColorDataToString(constants.pinkColor)]}
+                            colors={[utils.convertColorDataToString(constants.PINK_COLOR)]}
                         />
                     }
                 >
                     <View style={{...styles.mainContainerDefault}}>
                         <components.TaskButton
                             onPress={() => navigation.navigate('TaskEditor', {withGoBack: true, prevScreenName: 'HomeProfile'})}
-                            AvatarComponent={constants.avatars.PlusTaskAvatar}
+                            AvatarComponent={constants.TASKS_AVATARS.addTaskAvatar}
                             title={'Добавить новый план'}
                         />
                         {

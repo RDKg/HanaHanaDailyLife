@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, View, RefreshControl, TextInput, ImageBackground, ScrollView, TouchableHighlight, Text } from 'react-native';
 
-import * as ImagePicker from 'expo-image-picker';
-
-import * as constants from '../styles/constants.js';
+import * as constants from '../constants.js';
 import * as components from '../components.js';
 import * as utils from '../utils.js';
-import { StorageHandler } from '../data/dataHandler.js';
-import { openDB, DatabaseService } from '../data/databaseService.js';
-import { styles } from '../styles/styles.js';
-import { NotificationsService } from '../backgroundTask.js';
+import { LocalStorageHandler } from '../data/localStorageHandler.js';
+import { DatabaseHandler } from '../data/dbHandler.js';
+import { styles } from '../styles.js';
+import { NotificationsService } from '../deviceFeatures.js';
 
-const db = openDB('HanaHanaDailyLife.db');
-const dbService = new DatabaseService(db);
+const db = DatabaseHandler.openDb('HanaHanaDailyLife.db');
+const dbService = new DatabaseHandler(db);
 
 export const SettingsScreen = ({ navigation, route }) => {
     const withGoBack = route?.params?.withGoBack;
@@ -27,9 +25,9 @@ export const SettingsScreen = ({ navigation, route }) => {
     const [isRefreshing, setIsRefreshing] = useState(false);
 
     const fetchData = async () => {
-        const isStartEnabled = await StorageHandler.getStorageItem('isTaskStartNotificationsEnabled');
-        const isEndEnabled = await StorageHandler.getStorageItem('isTaskEndNotificationsEnabled');
-        const name = await StorageHandler.getStorageItem('username');
+        const isStartEnabled = await LocalStorageHandler.getStorageItem('isTaskStartNotificationsEnabled');
+        const isEndEnabled = await LocalStorageHandler.getStorageItem('isTaskEndNotificationsEnabled');
+        const name = await LocalStorageHandler.getStorageItem('username');
 
         return {
             isStartEnabled,
@@ -69,7 +67,7 @@ export const SettingsScreen = ({ navigation, route }) => {
 
     useEffect(() => {
         if (isDataLoaded) {
-            StorageHandler.saveStorageItem('isTaskStartNotificationsEnabled', `${isTaskStartNotificationsEnabled}`);
+            LocalStorageHandler.saveStorageItem('isTaskStartNotificationsEnabled', `${isTaskStartNotificationsEnabled}`);
         }
 
         if (isTaskStartNotificationsEnabled) {
@@ -87,7 +85,7 @@ export const SettingsScreen = ({ navigation, route }) => {
 
     useEffect(() => {
         if (isDataLoaded) {
-            StorageHandler.saveStorageItem('isTaskEndNotificationsEnabled', `${isTaskEndNotificationsEnabled}`);
+            LocalStorageHandler.saveStorageItem('isTaskEndNotificationsEnabled', `${isTaskEndNotificationsEnabled}`);
         }
 
         if (isTaskEndNotificationsEnabled) {
@@ -105,7 +103,7 @@ export const SettingsScreen = ({ navigation, route }) => {
 
     useEffect(() => {
         if (isChangeUsernameButtonPressed) {
-            StorageHandler.saveStorageItem('username', username);
+            LocalStorageHandler.saveStorageItem('username', username);
 
             setIsChangeUsernameButtonPressed(false);
         }
@@ -124,16 +122,19 @@ export const SettingsScreen = ({ navigation, route }) => {
 
     return (
         <View style={styles.mainContainer}>
-            <components.BackgroundComponent/>
-            <components.GoBackButton onPress={() => navigation.goBack()} withGoBack={withGoBack}/>
-            <SafeAreaView style={{gap: constants.margin, position: 'relative', flex: 1}}>   
+            <components.BackgroundImage/>
+            { 
+                withGoBack &&
+                <components.NavigatePreviousScreenButton onPress={() => navigation.goBack()}/>
+            }
+            <SafeAreaView style={{gap: constants.MARGIN, position: 'relative', flex: 1}}>   
                 <ScrollView 
                     style={{height: '100%'}}
                     refreshControl={
                         <RefreshControl
                             refreshing={isRefreshing}
                             onRefresh={onRefresh}
-                            colors={[utils.convertColorDataToString(constants.pinkColor)]}
+                            colors={[utils.convertColorDataToString(constants.PINK_COLOR)]}
                         />
                     }
                 >
@@ -141,7 +142,7 @@ export const SettingsScreen = ({ navigation, route }) => {
                         style={{
                             ...styles.mainContainerDefault, 
                             alignItems: 'flex-start',
-                            gap: constants.padding
+                            gap: constants.PADDING
                         }}
                     >
                         {
@@ -151,15 +152,15 @@ export const SettingsScreen = ({ navigation, route }) => {
                                     style={{
                                         ...styles.defaultBox, 
                                         ...styles.dropShadow,
-                                        padding: constants.padding,
-                                        gap: constants.padding,
+                                        padding: constants.PADDING,
+                                        gap: constants.PADDING,
                                         width: '100%',
                                     }}
                                 >
                                     <View 
                                         style={{
-                                            backgroundColor: utils.convertColorDataToString(constants.grayColor),
-                                            borderRadius: constants.borderRadius,
+                                            backgroundColor: utils.convertColorDataToString(constants.GRAY_COLOR),
+                                            borderRadius: constants.BORDER_RADIUS,
                                             width: '100%',
                                             aspectRatio: 1,
                                             position: 'relative',
@@ -169,9 +170,9 @@ export const SettingsScreen = ({ navigation, route }) => {
                                         <ImageBackground/>
                                         <TouchableHighlight
                                             onPress={() => {}}
-                                            underlayColor={utils.convertColorDataToString(constants.grayColor)}
+                                            underlayColor={utils.convertColorDataToString(constants.GRAY_COLOR)}
                                             style={{ 
-                                                backgroundColor: utils.convertColorDataToString(constants.blackColor),
+                                                backgroundColor: utils.convertColorDataToString(constants.BLACK_COLOR),
                                                 height: 50,
                                                 width: '100%',
                                                 position: 'absolute',
@@ -194,7 +195,7 @@ export const SettingsScreen = ({ navigation, route }) => {
                                             ...styles.inputAreaText, 
                                             ...styles.defaultBox,
                                             ...styles.dropShadow,
-                                            padding: constants.padding,
+                                            padding: constants.PADDING,
                                             width: '100%'
                                         }}
                                     />

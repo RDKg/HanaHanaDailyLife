@@ -1,10 +1,10 @@
 import React, { useState, useCallback } from 'react';
 import { SafeAreaView, Text, View, TouchableHighlight, ScrollView } from 'react-native';
 
-import * as constants from '../styles/constants.js';
+import * as constants from '../constants.js';
 import * as components from '../components.js';
 import * as utils from '../utils.js';
-import { styles } from '../styles/styles.js';
+import { styles } from '../styles.js';
 
 import aboutJsonData from '../contents/about.json';
 
@@ -32,15 +32,18 @@ export const AboutScreen = ({ navigation, route }) => {
     
     return (
         <View style={styles.mainContainer}>
-            <components.BackgroundComponent/>
-            <components.GoBackButton onPress={() => navigation.goBack()} withGoBack={withGoBack}/>
+            <components.BackgroundImage/>
+            { 
+                withGoBack &&
+                <components.NavigatePreviousScreenButton onPress={() => navigation.goBack()}/>
+            }
             <SafeAreaView style={{...styles.mainRestrictor}}> 
                 <ScrollView showsVerticalScrollIndicator={false}>
                     <View 
                         style={{
                             ...styles.marginVertical,
                             justifyContent: 'center',
-                            gap: constants.padding,
+                            gap: constants.PADDING,
                         }}
                     >
                         {
@@ -48,12 +51,12 @@ export const AboutScreen = ({ navigation, route }) => {
                                 <View key={key} style={{width: '100%', position: 'relative'}}>
                                     <TouchableHighlight
                                         onPress={() => handleActiveComponents(key)} 
-                                        underlayColor={utils.convertColorDataToString(constants.grayColor)}
+                                        underlayColor={utils.convertColorDataToString(constants.GRAY_COLOR)}
                                         style={{
                                             ...styles.defaultBox,
                                             ...styles.dropShadow,
                                             width: '100%',
-                                            padding: constants.padding,
+                                            padding: constants.PADDING,
                                             borderBottomRightRadius: 0,
                                             borderBottomLeftRadius: 0,
                                             zIndex: 5
@@ -63,11 +66,11 @@ export const AboutScreen = ({ navigation, route }) => {
                                     </TouchableHighlight>
                                     <TouchableHighlight
                                         onPress={() => handleActiveComponents(key)} 
-                                        underlayColor={utils.convertColorDataToString(constants.grayColor)}
+                                        underlayColor={utils.convertColorDataToString(constants.GRAY_COLOR)}
                                         style={{ 
                                             ...styles.defaultBox,
                                             width: '100%',
-                                            padding: activeComponents.includes(key) ? constants.padding : 5, 
+                                            padding: activeComponents.includes(key) ? constants.PADDING : 5, 
                                             borderTopRightRadius: 0,
                                             borderTopLeftRadius: 0,
                                         }}

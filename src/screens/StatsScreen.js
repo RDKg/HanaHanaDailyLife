@@ -2,10 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { SafeAreaView, Text, View, TouchableHighlight, ScrollView } from 'react-native';
 import { Line, Svg } from 'react-native-svg';
 
-import * as constants from '../styles/constants.js';
+import * as constants from '../constants.js';
 import * as components from '../components.js';
 import * as utils from '../utils.js';
-import { styles } from '../styles/styles.js';
+import { styles } from '../styles.js';
 
 export const StatsScreen = ({ navigation, route }) => {
     const withGoBack = route?.params?.withGoBack;
@@ -37,15 +37,18 @@ export const StatsScreen = ({ navigation, route }) => {
 
     return (
         <View style={styles.mainContainer}>
-            <components.BackgroundComponent/>
-            <components.GoBackButton onPress={() => navigation.goBack()} withGoBack={withGoBack}/>
-            <SafeAreaView style={{...styles.mainRestrictor, ...styles.marginVertical, gap: constants.margin}}>
+            <components.BackgroundImage/>
+            { 
+                withGoBack &&
+                <components.NavigatePreviousScreenButton onPress={() => navigation.goBack()}/>
+            }
+            <SafeAreaView style={{...styles.mainRestrictor, ...styles.marginVertical, gap: constants.MARGIN}}>
                 <View style={{...styles.defaultBox, ...styles.dropShadow, width: '100%'}}>
-                    <View style={{gap: 10, flexDirection: 'row', padding: constants.margin, alignItems: 'center'}}>
+                    <View style={{gap: 10, flexDirection: 'row', padding: constants.MARGIN, alignItems: 'center'}}>
                         <View style={{
                             alignItems: 'center', 
-                            gap: constants.padding*2, 
-                            marginHorizontal: constants.margin, 
+                            gap: constants.PADDING*2, 
+                            marginHorizontal: constants.MARGIN, 
                             marginTop: 40,
                             marginBottom: 25,
                         }}>
@@ -55,12 +58,12 @@ export const StatsScreen = ({ navigation, route }) => {
                                 </View>
                             ))}
                         </View>
-                        <View style={{flex: 1, gap: constants.margin}}>
+                        <View style={{flex: 1, gap: constants.MARGIN}}>
                             <View style={{
                                 flexDirection: 'row', 
                                 justifyContent: 'space-between', 
-                                paddingRight: constants.padding, 
-                                paddingLeft: constants.padding
+                                paddingRight: constants.PADDING, 
+                                paddingLeft: constants.PADDING
                                 }}
                             >
                                 {monthLabels.map((label, index) => (
@@ -69,8 +72,8 @@ export const StatsScreen = ({ navigation, route }) => {
                             </View>
                             <View 
                                 style={{
-                                    backgroundColor: utils.convertColorDataToString(constants.grayColor),
-                                    borderRadius: constants.borderRadius,
+                                    backgroundColor: utils.convertColorDataToString(constants.GRAY_COLOR),
+                                    borderRadius: constants.BORDER_RADIUS,
                                     flex: 1,
                                 }}
                             >
@@ -78,7 +81,7 @@ export const StatsScreen = ({ navigation, route }) => {
                                     style={{
                                         flex: 1, 
                                         justifyContent: 'space-between', 
-                                        paddingVertical: constants.padding*2, 
+                                        paddingVertical: constants.PADDING*2, 
                                         opacity: 0.25
                                     }}
                                 >
@@ -89,7 +92,7 @@ export const StatsScreen = ({ navigation, route }) => {
                             </View>
                         </View>
                     </View>
-                    {years.length > 0 ? <View style={{width: '100%', paddingHorizontal: constants.padding}}>
+                    {years.length > 0 ? <View style={{width: '100%', paddingHorizontal: constants.PADDING}}>
                         <ScrollView
                             ref={scrollViewRef}
                             horizontal={true}
@@ -98,9 +101,9 @@ export const StatsScreen = ({ navigation, route }) => {
                                 flexDirection: 'row',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                padding: constants.padding,
+                                padding: constants.PADDING,
                                 paddingTop: 0,
-                                gap: constants.padding*3,
+                                gap: constants.PADDING*3,
                             }}
                             onContentSizeChange={(contentWidth) => {
                                 setScrollViewWidth(contentWidth);
@@ -114,7 +117,7 @@ export const StatsScreen = ({ navigation, route }) => {
                                     <Text 
                                         style={{
                                             ...styles.defaultTextStats,
-                                            color: year === selectedYear ? utils.convertColorDataToString(constants.purpleColor) : styles.defaultTextStats.color,
+                                            color: year === selectedYear ? utils.convertColorDataToString(constants.PURPLE_COLOR) : styles.defaultTextStats.color,
                                             fontFamily: year === selectedYear ? 'RalewayRegular' : styles.defaultTextStats.fontFamily,
                                         }}
                                     >{year}</Text>
@@ -123,12 +126,12 @@ export const StatsScreen = ({ navigation, route }) => {
                         </ScrollView>
                     </View> : <Text style={{
                                         ...styles.defaultTextStats, 
-                                        padding: constants.padding, 
+                                        padding: constants.PADDING, 
                                         paddingTop: 0
                                     }}>Данные отсутствуют</Text>}
-                    {years.length > 0 ? <View style={{height: 1, width: '100%', padding: constants.padding, paddingTop: 0}}>
+                    {years.length > 0 ? <View style={{height: 1, width: '100%', padding: constants.PADDING, paddingTop: 0}}>
                         <Svg style={{height: 1}}>
-                            <Line x1='0' y1='0' x2='100%' y2='0' stroke={utils.convertColorDataToString(constants.blackColor)} strokeWidth='1'/>
+                            <Line x1='0' y1='0' x2='100%' y2='0' stroke={utils.convertColorDataToString(constants.BLACK_COLOR)} strokeWidth='1'/>
                         </Svg>
                     </View> : null}
                 </View>

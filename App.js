@@ -1,18 +1,16 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { View, StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-import * as TaskManager from 'expo-task-manager';
-import * as Notifications from 'expo-notifications';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
 
 import * as components from './src/components.js';
-import * as constants from './src/styles/constants.js';
+import * as constants from './src/constants.js';
 import * as utils from './src/utils.js';
-import { NotificationsService } from './src/backgroundTask.js';
-import { openDB, DatabaseService } from './src/data/databaseService.js';
+import { NotificationsService } from './src/deviceFeatures.js';
+import { DatabaseHandler } from './src/data/dbHandler.js';
 
 import { TaskTabNavigator } from './src/screens/TasksScreen.js';
 import { SettingsScreen } from './src/screens/SettingsScreen.js';
@@ -20,17 +18,17 @@ import { ProfileTabNavigator } from './src/screens/ProfileScreen.js';
 import { StatsScreen } from './src/screens/StatsScreen.js';
 import { HomeTabNavigator } from './src/screens/HomeScreen.js'
 
+const db = DatabaseHandler.openDb('HanaHanaDailyLife.db');
+const dbService = new DatabaseHandler(db);
+dbService.createAndInsertDefaultData();  
+
 const Tab = createBottomTabNavigator();
 
-const db = openDB('HanaHanaDailyLife.db');
-const dbService = new DatabaseService(db);
-
-dbService.createAndInsertDefaultData();  
 NotificationsService.registerForPushNotifications(); 
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-    const [fontsLoaded] = Font.useFonts(constants.fontFiles);
+    const [fontsLoaded] = Font.useFonts(constants.FONT_FILES);
 
     const onLayoutRootView = useCallback(async () => {
         if (fontsLoaded) {
@@ -53,7 +51,7 @@ export default function App() {
                         headerShown: false,
                         tabBarLabel: '',
                         tabBarStyle: {
-                            height: constants.heightNavTab,
+                            height: constants.HEIGHT_NAVIGATION_TAB,
                         },
                         style: {
                             flexDirection: 'row',

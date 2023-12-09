@@ -1,36 +1,36 @@
-import adventureTaskAvatar from '../../assets/ico/tasks/adventure-task-avatar.svg';
-import anotherTaskAvatar from '../../assets/ico/tasks/another-task-avatar.svg';
-import cleanTaskAvatar from '../../assets/ico/tasks/clean-task-avatar.svg';
-import foodTaskAvatar from '../../assets/ico/tasks/food-task-avatar.svg';
-import geoTaskAvatar from '../../assets/ico/tasks/geo-task-avatar.svg';
-import healthTaskAvatar from '../../assets/ico/tasks/health-task-avatar.svg';
-import hygieneTaskAvatar from '../../assets/ico/tasks/hygiene-task-avatar.svg';
-import inviteTaskAvatar from '../../assets/ico/tasks/invite-task-avatar.svg';
-import meetingTaskAvatar from '../../assets/ico/tasks/meeting-task-avatar.svg';
-import petTaskAvatar from '../../assets/ico/tasks/pet-task-avatar.svg';
-import relaxTaskAvatar from '../../assets/ico/tasks/relax-task-avatar.svg';
-import shopTaskAvatar from '../../assets/ico/tasks/shop-task-avatar.svg';
-import sleepTaskAvatar from '../../assets/ico/tasks/sleep-task-avatar.svg';
-import sportTaskAvatar from '../../assets/ico/tasks/sport-task-avatar.svg';
-import studyTaskAvatar from '../../assets/ico/tasks/study-task-avatar.svg';
-import taskTaskAvatar from '../../assets/ico/tasks/task-task-avatar.svg';
-import walkTaskAvatar from '../../assets/ico/tasks/walk-task-avatar.svg';
-import workTaskAvatar from '../../assets/ico/tasks/work-task-avatar.svg';
-import addTaskAvatar from '../../assets/ico/tasks/add-task-avatar.svg';
+import adventureTaskAvatar from '../assets/ico/tasks/adventure-task-avatar.svg';
+import anotherTaskAvatar from '../assets/ico/tasks/another-task-avatar.svg';
+import cleanTaskAvatar from '../assets/ico/tasks/clean-task-avatar.svg';
+import foodTaskAvatar from '../assets/ico/tasks/food-task-avatar.svg';
+import geoTaskAvatar from '../assets/ico/tasks/geo-task-avatar.svg';
+import healthTaskAvatar from '../assets/ico/tasks/health-task-avatar.svg';
+import hygieneTaskAvatar from '../assets/ico/tasks/hygiene-task-avatar.svg';
+import inviteTaskAvatar from '../assets/ico/tasks/invite-task-avatar.svg';
+import meetingTaskAvatar from '../assets/ico/tasks/meeting-task-avatar.svg';
+import petTaskAvatar from '../assets/ico/tasks/pet-task-avatar.svg';
+import relaxTaskAvatar from '../assets/ico/tasks/relax-task-avatar.svg';
+import shopTaskAvatar from '../assets/ico/tasks/shop-task-avatar.svg';
+import sleepTaskAvatar from '../assets/ico/tasks/sleep-task-avatar.svg';
+import sportTaskAvatar from '../assets/ico/tasks/sport-task-avatar.svg';
+import studyTaskAvatar from '../assets/ico/tasks/study-task-avatar.svg';
+import taskTaskAvatar from '../assets/ico/tasks/task-task-avatar.svg';
+import walkTaskAvatar from '../assets/ico/tasks/walk-task-avatar.svg';
+import workTaskAvatar from '../assets/ico/tasks/work-task-avatar.svg';
+import addTaskAvatar from '../assets/ico/tasks/add-task-avatar.svg';
 
-export const fontFiles = {
-    RalewayThin: require('../../assets/fonts/Raleway-Thin.ttf'),
-    RalewayExtraLight: require('../../assets/fonts/Raleway-ExtraLight.ttf'),
-    RalewayLight: require('../../assets/fonts/Raleway-Light.ttf'),
-    RalewayRegular: require('../../assets/fonts/Raleway-Regular.ttf'),
-    RalewayMedium: require('../../assets/fonts/Raleway-Medium.ttf'),
-    RalewaySemiBold: require('../../assets/fonts/Raleway-SemiBold.ttf'),
-    RalewayBold: require('../../assets/fonts/Raleway-Bold.ttf'),
-    RalewayExtraBold: require('../../assets/fonts/Raleway-ExtraBold.ttf'),
-    RalewayBlack: require('../../assets/fonts/Raleway-Black.ttf'),
+export const FONT_FILES = {
+    RalewayThin: require('../assets/fonts/Raleway-Thin.ttf'),
+    RalewayExtraLight: require('../assets/fonts/Raleway-ExtraLight.ttf'),
+    RalewayLight: require('../assets/fonts/Raleway-Light.ttf'),
+    RalewayRegular: require('../assets/fonts/Raleway-Regular.ttf'),
+    RalewayMedium: require('../assets/fonts/Raleway-Medium.ttf'),
+    RalewaySemiBold: require('../assets/fonts/Raleway-SemiBold.ttf'),
+    RalewayBold: require('../assets/fonts/Raleway-Bold.ttf'),
+    RalewayExtraBold: require('../assets/fonts/Raleway-ExtraBold.ttf'),
+    RalewayBlack: require('../assets/fonts/Raleway-Black.ttf'),
 };
 
-export const avatars = {
+export const TASKS_AVATARS = {
     adventureTaskAvatar,
     anotherTaskAvatar,
     cleanTaskAvatar,
@@ -52,7 +52,7 @@ export const avatars = {
     addTaskAvatar,
 };
 
-export const defaultCategories = {
+export const DEFAULT_DATABASE_DATA = {
     0: {
         title: 'Прогулка',
         avatar: 'walkTaskAvatar',
@@ -110,24 +110,24 @@ export const defaultCategories = {
     },
 }
 
-export const padding = 15;
-export const margin = 10;
-export const borderRadius = 15;
-export const heightNavTab = 75;
+export const PADDING = 15;
+export const MARGIN = 10;
+export const BORDER_RADIUS = 15;
+export const HEIGHT_NAVIGATION_TAB = 75;
 
-export const pinkColor = {rgb: [249, 145, 182], a: 1.0};
-export const purpleColor = {rgb: [135, 128, 246], a: 1.0};
-export const blackColor = {rgb: [82, 82, 82], a: 1.0};
-export const greenColor = {rgb: [142, 234, 151], a: 1.0};
-export const whiteColor = {rgb: [249, 249, 249], a: 1.0};
-export const grayColor = {rgb: [242, 242, 242], a: 1.0};
+export const PINK_COLOR = {rgb: [249, 145, 182], a: 1.0};
+export const PURPLE_COLOR = {rgb: [135, 128, 246], a: 1.0};
+export const BLACK_COLOR = {rgb: [82, 82, 82], a: 1.0};
+export const GREEN_COLOR = {rgb: [142, 234, 151], a: 1.0};
+export const WHITE_COLOR = {rgb: [249, 249, 249], a: 1.0};
+export const GRAY_COLOR = {rgb: [242, 242, 242], a: 1.0};
 
-export const pinkToPurpleGradient = {
+export const PINK_TO_PURPLE_GRADIENT = {
     colors: ['rgba(249,84,143, 1.0)', 'rgba(144,108,249, 1.0)'],
     start: {x: 0, y: 0}, 
     end: {x: 1, y: 1},
 };
-export const pinkToPurpleLightGradient = {
+export const PINK_TO_PURPLE_LIGHT_GRADIENT = {
     colors: ['rgba(245,160,190, 1)', 'rgba(122,128,255, 1)'], 
     start: {x: 0, y: 0},
     end: {x: 1, y: 1}

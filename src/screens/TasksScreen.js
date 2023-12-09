@@ -1,27 +1,22 @@
-import React, { useState, useEffect, useRef, Fragment } from 'react';
+import React, { useState, useEffect, Fragment } from 'react';
 import { SafeAreaView, Text, View, TouchableHighlight, ScrollView, Alert, Linking, TextInput, RefreshControl } from 'react-native';
-import { Line, Svg } from 'react-native-svg';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
-import DateTimePicker from '@react-native-community/datetimepicker';
 
-import { v4 as uuidv4 } from 'uuid'; 
-import { LinearGradient } from 'expo-linear-gradient';
-import * as Location from 'expo-location';
-
-import * as constants from '../styles/constants.js';
+import * as constants from '../constants.js';
 import * as components from '../components.js';
 import * as utils from '../utils.js';
-import { NotificationsService } from '../backgroundTask.js';
-import { openDB, DatabaseService, Task } from '../data/databaseService.js';
-import { styles } from '../styles/styles.js';
+import { NotificationsService, LocationService } from '../deviceFeatures.js';
+import { DatabaseHandler } from '../data/dbHandler.js';
+import { Task } from '../data/models.js'
+import { styles } from '../styles.js';
 
 import HistorySVG from '../../assets/ico/history-ico.svg';
 
 const Stack = createNativeStackNavigator();
 
-const db = openDB('HanaHanaDailyLife.db');
-const dbService = new DatabaseService(db);
+const db = DatabaseHandler.openDb('HanaHanaDailyLife.db');
+const dbService = new DatabaseHandler(db);
 
 export const TaskTabNavigator = ({route}) => {
     const withGoBack = route?.params?.withGoBack;
@@ -149,26 +144,29 @@ export const TasksScreen = ({navigation, route}) => {
 
     return (
         <View style={styles.mainContainer}>
-            <components.BackgroundComponent/>
-            <components.GoBackButton onPress={() => navigation.goBack()} withGoBack={withGoBack}/>
+            <components.BackgroundImage/>
+            { 
+                withGoBack &&
+                <components.NavigatePreviousScreenButton onPress={() => navigation.goBack()}/>
+            }
             <TouchableHighlight 
                 onPress={() => {setIsShowingCompleted(!isShowingCompleted)}}
-                underlayColor={utils.convertColorDataToString(constants.grayColor)}
+                underlayColor={utils.convertColorDataToString(constants.GRAY_COLOR)}
                 style={{ 
                     ...styles.defaultBox,
                     ...styles.dropShadow,
-                    borderColor: isShowingCompleted ? utils.convertColorDataToString(constants.purpleColor) : 'transparent',
+                    borderColor: isShowingCompleted ? utils.convertColorDataToString(constants.PURPLE_COLOR) : 'transparent',
                     borderWidth: 1,
                     position: 'absolute', 
-                    bottom: constants.margin,
-                    right: constants.margin,
-                    padding: constants.padding,
+                    bottom: constants.MARGIN,
+                    right: constants.MARGIN,
+                    padding: constants.PADDING,
                     zIndex: 9999,
                 }}
             >
                 <HistorySVG width={26} height={26}/>
             </TouchableHighlight>
-            <SafeAreaView style={{gap: constants.margin, position: 'relative', flex: 1}}>   
+            <SafeAreaView style={{gap: constants.MARGIN, position: 'relative', flex: 1}}>   
                 <ScrollView
                     style={{height: '100%'}}
                     scrollEventThrottle={250}
@@ -177,14 +175,14 @@ export const TasksScreen = ({navigation, route}) => {
                         <RefreshControl
                             refreshing={isRefreshing}
                             onRefresh={onRefresh}
-                            colors={[utils.convertColorDataToString(constants.pinkColor)]}
+                            colors={[utils.convertColorDataToString(constants.PINK_COLOR)]}
                         />
                     }
                 >
                     <View style={{...styles.mainContainerDefault}}>
                         <components.TaskButton
                             onPress={() => navigation.navigate('TaskEditor', {withGoBack: true, prevScreenName: 'HomeTask'})}
-                            AvatarComponent={constants.avatars.addTaskAvatar}
+                            AvatarComponent={constants.TASKS_AVATARS.addTaskAvatar}
                             title={'Добавить новый план'}
                         />
                         {
@@ -364,7 +362,7 @@ export const TaskEditorScreen = ({navigation, route}) => {
     // Проверка включенной геолокации и разрешений на нее
     useEffect(() => {
         if (isCheckingLocationSettings === true) {
-            utils.checkLocation()
+            LocationService.checkLocationPermissionsAndStatus()
             .then(({ isBackgroundGranted, isForegroundGranted, isLocationEnabled }) => {
                 setLocationSettingsData({
                     isForegroundGranted,
@@ -483,7 +481,7 @@ export const TaskEditorScreen = ({navigation, route}) => {
     useEffect(() => {
         if (locationSettingsData.isForegroundGranted && isMapEnabled) {
             const interval = setInterval(() => {
-                utils.getCurrentLocation()
+                LocationService.getCurrentLocation()
                 .then(result => {
                     if (result) {
                         setCurrentLocation(result);
@@ -500,8 +498,11 @@ export const TaskEditorScreen = ({navigation, route}) => {
 
     return (
         <View style={styles.mainContainer}>
-            <components.BackgroundComponent/>
-            <components.GoBackButton onPress={() => navigation.goBack()} withGoBack={withGoBack}/>
+            <components.BackgroundImage/>
+            { 
+                withGoBack &&
+                <components.NavigatePreviousScreenButton onPress={() => navigation.goBack()}/>
+            }
             {
                 isMapEnabled && locationSettingsData.isForegroundGranted && currentLocation ?
                 <View
@@ -530,7 +531,7 @@ export const TaskEditorScreen = ({navigation, route}) => {
                             startLocation &&
                             <Marker
                                 coordinate={startLocation}
-                                pinColor={utils.convertColorDataToString(constants.pinkColor)}
+                                pinColor={utils.convertColorDataToString(constants.PINK_COLOR)}
                                 title='Начальная позиция'
                                 description='Нажмите на надпись чтобы удалить метку!'
                                 draggable={true}
@@ -541,7 +542,7 @@ export const TaskEditorScreen = ({navigation, route}) => {
                             endLocation &&
                             <Marker
                                 coordinate={endLocation}
-                                pinColor={utils.convertColorDataToString(constants.greenColor)}
+                                pinColor={utils.convertColorDataToString(constants.GREEN_COLOR)}
                                 title='Конечная позиция'
                                 description='Нажмите на надпись чтобы удалить метку!'
                                 centerOffset={5}
@@ -561,9 +562,9 @@ export const TaskEditorScreen = ({navigation, route}) => {
                     <Text style={styles.boxTitleText}>КАРТА ВЫКЛЮЧЕНА</Text>
                 </View>
             }
-            <SafeAreaView style={{gap: constants.margin, position: 'relative', flex: 1}}>
+            <SafeAreaView style={{gap: constants.MARGIN, position: 'relative', flex: 1}}>
                 <ScrollView> 
-                    <View style={{...styles.mainContainerDefault, marginTop: constants.margin}}> 
+                    <View style={{...styles.mainContainerDefault, marginTop: constants.MARGIN}}> 
                         {
                             data?.categories &&
                             <components.BoxToolBar 
@@ -603,14 +604,14 @@ export const TaskEditorScreen = ({navigation, route}) => {
                             }
                             <TouchableHighlight
                                 onPress={() => {setShowingStartDateTimePicker('start')}}
-                                underlayColor={utils.convertColorDataToString(constants.blackColor)}
+                                underlayColor={utils.convertColorDataToString(constants.BLACK_COLOR)}
                                 style={{...styles.defaultBox, position: 'relative'}}
                             >
                                 <Text style={{
                                         ...styles.selectListInputStyles,
-                                        backgroundColor: utils.convertColorDataToString(constants.grayColor),
-                                        color: utils.convertColorDataToString(constants.blackColor),
-                                        padding: constants.padding,
+                                        backgroundColor: utils.convertColorDataToString(constants.GRAY_COLOR),
+                                        color: utils.convertColorDataToString(constants.BLACK_COLOR),
+                                        padding: constants.PADDING,
                                         fontVariant: 'lining-nums'
                                     }}
                                 >{formattedStartDateText}</Text>
@@ -630,14 +631,14 @@ export const TaskEditorScreen = ({navigation, route}) => {
                             }
                             <TouchableHighlight
                                 onPress={() => {setShowingStartDateTimePicker('end')}}
-                                underlayColor={utils.convertColorDataToString(constants.blackColor)}
+                                underlayColor={utils.convertColorDataToString(constants.BLACK_COLOR)}
                                 style={{...styles.defaultBox, position: 'relative'}}
                             >
                                 <Text style={{
                                         ...styles.selectListInputStyles,
-                                        backgroundColor: utils.convertColorDataToString(constants.grayColor),
-                                        color: utils.convertColorDataToString(constants.blackColor),
-                                        padding: constants.padding,
+                                        backgroundColor: utils.convertColorDataToString(constants.GRAY_COLOR),
+                                        color: utils.convertColorDataToString(constants.BLACK_COLOR),
+                                        padding: constants.PADDING,
                                         fontVariant: 'lining-nums'
                                     }}
                                 >{formattedEndDateText}</Text>
@@ -652,7 +653,7 @@ export const TaskEditorScreen = ({navigation, route}) => {
                                 ...styles.inputAreaText, 
                                 ...styles.defaultBox,
                                 ...styles.dropShadow,
-                                padding: constants.padding,
+                                padding: constants.PADDING,
                                 width: '100%'
                             }}
                         />
@@ -665,7 +666,7 @@ export const TaskEditorScreen = ({navigation, route}) => {
                                 ...styles.inputAreaText, 
                                 ...styles.defaultBox,
                                 ...styles.dropShadow,
-                                padding: constants.padding,
+                                padding: constants.PADDING,
                                 width: '100%',
                                 height: 150
                             }}
@@ -681,7 +682,7 @@ export const TaskEditorScreen = ({navigation, route}) => {
                                     ...styles.inputAreaText, 
                                     ...styles.defaultBox,
                                     ...styles.dropShadow,
-                                    padding: constants.padding,
+                                    padding: constants.PADDING,
                                     width: '100%',
                                 }}
                             />
@@ -692,7 +693,7 @@ export const TaskEditorScreen = ({navigation, route}) => {
                                     fontSize: 24,
                                     position: 'absolute',
                                     top: 10,
-                                    right: constants.padding
+                                    right: constants.PADDING
                                 }}
                             >₽</Text>
                         </View>   
@@ -724,7 +725,7 @@ export const TaskEditorScreen = ({navigation, route}) => {
                                     <components.CustomButton 
                                         title='Удалить' 
                                         onPress={deleteTask}
-                                        backgroundColor={utils.convertColorDataToString(constants.pinkColor)}
+                                        backgroundColor={utils.convertColorDataToString(constants.PINK_COLOR)}
                                     />
                                     <components.CustomButton 
                                         title='Изменить'
@@ -825,7 +826,7 @@ export const TaskDetailsScreen = ({navigation, route}) => {
 
     // Проверка включенной геолокации и разрешений на нее
     useEffect(() => {
-        utils.checkLocation()
+        LocationService.checkLocationPermissionsAndStatus()
         .then(({ isBackgroundGranted, isForegroundGranted, isLocationEnabled }) => {
             setLocationSettingsData({
                 isForegroundGranted,
@@ -839,7 +840,7 @@ export const TaskDetailsScreen = ({navigation, route}) => {
     useEffect(() => {
         if (locationSettingsData.isLocationEnabled && taskData.is_map_enabled) {
             const interval = setInterval(() => {
-                utils.getCurrentLocation()
+                LocationService.getCurrentLocation()
                 .then(result => {
                     setCurrentLocation(result);
                 });
@@ -893,8 +894,11 @@ export const TaskDetailsScreen = ({navigation, route}) => {
 
     return (
         <View style={styles.mainContainer}>
-            <components.BackgroundComponent/>
-            <components.GoBackButton onPress={() => navigation.goBack()} withGoBack={withGoBack}/>
+            <components.BackgroundImage/>
+            { 
+                withGoBack &&
+                <components.NavigatePreviousScreenButton onPress={() => navigation.goBack()}/>
+            }
             {
                 isMapEnabled ?
                 <View                    
@@ -918,7 +922,7 @@ export const TaskDetailsScreen = ({navigation, route}) => {
                                     latitude: taskData.start_latitude,
                                     longitude: taskData.start_longitude
                                 }}
-                                pinColor={utils.convertColorDataToString(constants.pinkColor)}
+                                pinColor={utils.convertColorDataToString(constants.PINK_COLOR)}
                                 title='Начальная позиция'
                                 description='Эту позицию вы указали, как отправную!'
                             />
@@ -930,7 +934,7 @@ export const TaskDetailsScreen = ({navigation, route}) => {
                                     latitude: taskData.end_latitude,
                                     longitude: taskData.end_longitude
                                 }}
-                                pinColor={utils.convertColorDataToString(constants.greenColor)}
+                                pinColor={utils.convertColorDataToString(constants.GREEN_COLOR)}
                                 title='Конечная позиция'
                                 description='Эту позицию вы указали, как конечную!'
                                 centerOffset={5}
@@ -948,18 +952,18 @@ export const TaskDetailsScreen = ({navigation, route}) => {
                     <Text style={{...styles.boxTitleText}}>КАРТА ВЫКЛЮЧЕНА</Text>
                 </View>
             }
-            <SafeAreaView style={{gap: constants.margin, position: 'relative', flex: 1}}>
+            <SafeAreaView style={{gap: constants.MARGIN, position: 'relative', flex: 1}}>
                 <ScrollView>
-                    <View style={{...styles.mainContainerDefault, marginTop: constants.margin}}> 
+                    <View style={{...styles.mainContainerDefault, marginTop: constants.MARGIN}}> 
                         <View
                             style={{
                                 ...styles.dropShadow, 
                                 ...styles.defaultBox,
-                                padding: constants.padding,
+                                padding: constants.PADDING,
                                 justifyContent: 'flex-start',
                                 width: '100%',
                                 minHeight: 250,
-                                gap: constants.padding
+                                gap: constants.PADDING
                             }}
                         >
                             <Text style={styles.boxTitleText}>{taskData?.title}</Text>
@@ -967,8 +971,8 @@ export const TaskDetailsScreen = ({navigation, route}) => {
                             <View
                                 style={{
                                     ...styles.defaultBox,
-                                    backgroundColor: utils.convertColorDataToString(constants.grayColor),
-                                    padding: constants.padding,
+                                    backgroundColor: utils.convertColorDataToString(constants.GRAY_COLOR),
+                                    padding: constants.PADDING,
                                     width: '100%',
                                 }}
                             >
@@ -977,7 +981,7 @@ export const TaskDetailsScreen = ({navigation, route}) => {
                             <Text 
                                 style={{
                                     ...styles.defaultLabelText, 
-                                    color: utils.convertColorDataToString(constants.greenColor)
+                                    color: utils.convertColorDataToString(constants.GREEN_COLOR)
                                 }}
                             >
                                 <Text style={{...styles.defaultLabelText, fontFamily: 'RalewayMedium'}}>Начало: </Text> 
@@ -986,7 +990,7 @@ export const TaskDetailsScreen = ({navigation, route}) => {
                             <Text 
                                 style={{
                                     ...styles.defaultLabelText, 
-                                    color: utils.convertColorDataToString(constants.pinkColor)
+                                    color: utils.convertColorDataToString(constants.PINK_COLOR)
                                 }}
                             >
                                 <Text style={{...styles.defaultLabelText, fontFamily: 'RalewayMedium'}}>Конец: </Text> 
@@ -1023,7 +1027,7 @@ export const TaskDetailsScreen = ({navigation, route}) => {
                                     <View></View>
                                 }
                                 <components.CustomButton 
-                                    backgroundColor={utils.convertColorDataToString(constants.pinkColor)} 
+                                    backgroundColor={utils.convertColorDataToString(constants.PINK_COLOR)} 
                                     title='Удалить' 
                                     onPress={deleteTask}
                                 />

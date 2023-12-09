@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export class StorageHandler {
+export class LocalStorageHandler {
     static async getStorageItem(key) {
         try {
             const value = await AsyncStorage.getItem(key);
@@ -49,6 +49,6 @@ export class StorageHandler {
     }
 }
 
-StorageHandler.saveStorageItemIfNotExists('isTaskStartNotificationsEnabled', 'true');
-StorageHandler.saveStorageItemIfNotExists('isTaskEndNotificationsEnabled', 'true');
-StorageHandler.saveStorageItemIfNotExists('username', 'Ваш профиль');
+LocalStorageHandler.saveStorageItemIfNotExists('isTaskStartNotificationsEnabled', 'true');
+LocalStorageHandler.saveStorageItemIfNotExists('isTaskEndNotificationsEnabled', 'true');
+LocalStorageHandler.saveStorageItemIfNotExists('username', 'Ваш профиль');

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment, useRef } from 'react';
+import React, { useState, Fragment } from 'react';
 import { View, TouchableOpacity, Animated, Text, TouchableHighlight, FlatList, RefreshControl } from 'react-native';
 import { SvgXml, Line, Svg } from 'react-native-svg';
 import { SelectList } from 'react-native-dropdown-select-list';
@@ -7,16 +7,16 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { v4 as uuidv4 } from 'uuid'; 
 import { LinearGradient } from 'expo-linear-gradient';
 
-import * as constants from './styles/constants.js';
+import * as constants from './constants.js';
 import * as utils from './utils.js';
-import { styles } from './styles/styles.js';
+import { styles } from './styles.js';
 
 import BackgroundSVG from '../assets/img/background.svg';
 import BackgroundProfileSVG from '../assets/img/background-header-avatar-vector.svg';
 import ArrowBackSVG from '../assets/ico/arrow-back-ico.svg';
 import ArrowDownSVG from '../assets/ico/arrow-down-ico.svg';
 
-export const BackgroundComponent = () => {
+export const BackgroundImage = () => {
     return (
         <View style={styles.backgroundWrapper}>
             <BackgroundSVG width={'100%'}/>
@@ -24,7 +24,7 @@ export const BackgroundComponent = () => {
     );
 }
 
-export const BackgroundProfileComponent = () => {
+export const BackgroundImageProfile = () => {
     return (
         <View style={{...styles.backgroundWrapper, gap: -150}}>
             <BackgroundProfileSVG width={'100%'} style={{top: -75}}/>
@@ -33,11 +33,13 @@ export const BackgroundProfileComponent = () => {
     );
 }
 
-export const GoBackButtonComponent = ({onPress}) => {
+export const NavigatePreviousScreenButton = ({ 
+    onPress 
+}) => {
     return (
         <TouchableHighlight 
             onPress={() => onPress()}
-            underlayColor={utils.convertColorDataToString(constants.grayColor)}
+            underlayColor={utils.convertColorDataToString(constants.GRAY_COLOR)}
             style={{
                 ...styles.marginVertical,
                 ...styles.defaultBox, 
@@ -45,7 +47,7 @@ export const GoBackButtonComponent = ({onPress}) => {
                 width: 34, 
                 height: 32,
                 position: 'absolute',
-                left: constants.margin,
+                left: constants.MARGIN,
                 zIndex: 9999,
             }}
         >
@@ -54,74 +56,54 @@ export const GoBackButtonComponent = ({onPress}) => {
     );
 }
 
-export const SvgXmlRenderer = ({SvgXmlString, width, height}) => {
-    return <SvgXml xml={SvgXmlString} width={width} height={height}/>
+export const SvgXmlRenderer = ({ 
+    svgXmlString, 
+    width, 
+    height 
+}) => {
+    return (
+        <SvgXml xml={svgXmlString} width={width} height={height}/>
+    );
 }
 
-export const NavigationTabButton = ({Component, isActive}) => {
+export const NavigationTabButton = ({ 
+    Component, 
+    isActive 
+}) => {
     if (isActive) {
-        Component = <>
-            {Component}
-            <LinearGradient
-                colors={[utils.convertColorDataToString(constants.pinkColor), 'rgba(255, 5, 95, 0.19)', 'transparent']}
-                locations={[0, 0.1, 1]}
-                style={{...styles.activeTabButton, ...styles.gradient}}
-            />
-        </>
+        Component = (
+            <>
+                {Component}
+                <LinearGradient
+                    colors={[utils.convertColorDataToString(constants.PINK_COLOR), 'rgba(255, 5, 95, 0.19)', 'transparent']}
+                    locations={[0, 0.1, 1]}
+                    style={{...styles.activeTabButton, ...styles.gradient}}
+                />
+            </>
+        );
     }
 
     return Component;
 }
 
-export const JumpAnimation = ({Component, heightJump=5, duration=75}) => {
-    let translateY = new Animated.Value(0);
-
-    let handleJump = () => {
-        Animated.sequence([
-            Animated.timing(translateY, {
-                toValue: -heightJump, 
-                duration: duration,
-                useNativeDriver: true,
-            }),
-            Animated.timing(translateY, {
-                toValue: 0,
-                duration: duration,
-                useNativeDriver: true,
-            }),
-        ]).start();
-    };
-
-    let animatedStyle = {
-        transform: [{ translateY }],
-    };
+export const TabBarIcon = ({ 
+    svgXmlStringObj, 
+    isFocused, 
+    width=26, 
+    height=26 
+}) => {
+    let svgXmlString = svgXmlStringObj(isFillGradient=(isFocused));
+    let SvgXmlComponent = <SvgXmlRenderer svgXmlString={svgXmlString} width={width} height={height}/>;
 
     return (
-        <TouchableOpacity onPress={handleJump}>
-            <Animated.View style={animatedStyle}>
-                {Component}
-            </Animated.View>
-        </TouchableOpacity>
+        <NavigationTabButton Component={SvgXmlComponent} isActive={isFocused}/>
     );
-}
-
-export const TabBarIcon = ({svgXmlStringObj, isFocused, width=26, height=26}) => {
-    let svgXmlString = svgXmlStringObj(isFillGradient=(isFocused));
-    let SvgXmlComponent = <SvgXmlRenderer SvgXmlString={svgXmlString} width={width} height={height}/>
-
-    return <NavigationTabButton Component={SvgXmlComponent} isActive={isFocused}/>
-}
-
-export const GoBackButton = ({onPress, withGoBack}) => {
-    if (withGoBack) 
-        return <GoBackButtonComponent onPress={onPress}/>
-    
-    return null;
 }
 
 export const TaskButton = ({
     onPress=null, 
-    underlayColor=utils.convertColorDataToString(constants.grayColor),
-    AvatarComponent=constants.avatars.anotherTaskAvatar, 
+    underlayColor=utils.convertColorDataToString(constants.GRAY_COLOR),
+    AvatarComponent=constants.TASKS_AVATARS.anotherTaskAvatar, 
     title=null, 
     description=null,
 }) => {
@@ -132,10 +114,10 @@ export const TaskButton = ({
             style={{
                 ...styles.defaultBox, 
                 ...styles.dropShadow, 
-                padding: constants.padding,
+                padding: constants.PADDING,
                 flexDirection: 'row',
                 justifyContent: 'flex-start',
-                gap: constants.padding,
+                gap: constants.PADDING,
                 position: 'relative'
             }}
         >
@@ -144,7 +126,7 @@ export const TaskButton = ({
                 <View 
                     style={{
                         flex: 1,
-                        gap: constants.margin / 2,
+                        gap: constants.MARGIN / 2,
                         marginTop: -5,
                     }}
                 >   
@@ -201,7 +183,7 @@ export const TasksButtons = ({
             const taskButton = (
                 <TaskButton
                     key={uuidv4()}
-                    AvatarComponent={constants.avatars[item.avatar]}
+                    AvatarComponent={constants.TASKS_AVATARS[item.avatar]}
                     description={item.description}
                     title={item.title}
                     onPress={() => {navigation.navigate(
@@ -222,9 +204,9 @@ export const TasksButtons = ({
                         currentDate >= startDate ?
                         <LinearGradient
                             key={uuidv4()}
-                            colors={constants.pinkToPurpleGradient.colors}
-                            start={constants.pinkToPurpleGradient.start}
-                            end={constants.pinkToPurpleGradient.end}
+                            colors={constants.PINK_TO_PURPLE_GRADIENT.colors}
+                            start={constants.PINK_TO_PURPLE_GRADIENT.start}
+                            end={constants.PINK_TO_PURPLE_GRADIENT.end}
                             style={{
                                 ...styles.gradientBorder,
                             }}
@@ -240,8 +222,8 @@ export const TasksButtons = ({
                         style={{
                             ...styles.hintText, 
                             position: 'absolute',
-                            color: utils.convertColorDataToString(constants.greenColor),
-                            padding: constants.padding,
+                            color: utils.convertColorDataToString(constants.GREEN_COLOR),
+                            padding: constants.PADDING,
                             right: 0,
                             top: 0,
                         }}
@@ -251,8 +233,8 @@ export const TasksButtons = ({
                         style={{
                             ...styles.hintText, 
                             position: 'absolute',
-                            color: utils.convertColorDataToString(constants.pinkColor),
-                            padding: constants.padding,
+                            color: utils.convertColorDataToString(constants.PINK_COLOR),
+                            padding: constants.PADDING,
                             right: 0,
                             bottom: 0,
                             
@@ -271,129 +253,6 @@ export const TasksButtons = ({
     });
 
     return tasksButtons;
-}
-
-export const FlatListTasksButtons = (props) => {
-    const currentDate = new Date();
-    const {    
-        data,
-        currentScreenName,
-        navigation,
-        onScroll,
-        onRefresh,
-        refreshing,
-        refreshList,
-        children
-    } = props;
-
-    if (data.length == 0) {
-        data.push(1);
-    }
-
-    return (
-        <FlatList
-            data={data}
-            style={{height: '100%', width: '100%'}}
-            contentContainerStyle={{gap: constants.padding}}
-            scrollEventThrottle={250}
-            onScroll={onScroll} 
-            extraData={refreshList}
-            keyExtractor={(item) => uuidv4()}
-            renderItem={({item}) => (
-                <View style={{gap: constants.padding}}> 
-                    <Text style={{...styles.screenTitleText, textAlign: 'center'}}>{item.title}</Text>
-                    <FlatList
-                        scrollEventThrottle={250}
-                        data={item.data}
-                        style={{gap: constants.padding, width: '100%'}}
-                        keyExtractor={(subItem) => subItem.id}
-                        renderItem={({item: subItem}) => {
-                            const startDate = new Date(subItem.started_at);
-                            const endDate = new Date(subItem.ended_at);
-                            const startTimeString = utils.convertDateToStringFormat(
-                                startDate, 
-                                {
-                                    isDay: false, 
-                                    isMonth: false, 
-                                    isYear: false
-                                }
-                            );
-
-                            let timeRemaining = utils.getTimeRemaining(currentDate, endDate);
-                
-                            if (timeRemaining == null) {
-                                timeRemaining = utils.convertDateToStringFormat(endDate, {});
-                            }
-
-                            const taskButton = (
-                                <TaskButton 
-                                    AvatarComponent={constants.avatars[subItem.avatar]} 
-                                    description={subItem.description} 
-                                    title={subItem.title}
-                                    onPress={() => {navigation.navigate(
-                                            currentDate >= startDate ? 'TaskDetails' : 'TaskEditor', 
-                                            {
-                                                withGoBack: true, 
-                                                data: subItem, 
-                                                prevScreenName: currentScreenName
-                                            }
-                                        );
-                                    }}
-                                />
-                            );
-
-                            return (
-                                <View style={{width: '100%'}}>
-                                    {
-                                        currentDate >= startDate ?
-                                        <LinearGradient
-                                            colors={constants.pinkToPurpleGradient.colors}
-                                            start={constants.pinkToPurpleGradient.start}
-                                            end={constants.pinkToPurpleGradient.end}
-                                            style={{
-                                                ...styles.gradientBorder,
-                                            }}
-                                        >
-                                            {taskButton}
-                                        </LinearGradient> :
-                                        <Fragment>
-                                            {taskButton}
-                                        </Fragment>
-                                    }
-                                    <Text 
-                                        style={{
-                                            ...styles.hintText, 
-                                            position: 'absolute',
-                                            padding: constants.padding,
-                                            right: 0,
-                                            top: 0,
-                                        }}
-                                        >{startTimeString}</Text>
-                                    <Text 
-                                        style={{
-                                            ...styles.hintText, 
-                                            position: 'absolute',
-                                            color: utils.convertColorDataToString(constants.pinkColor),
-                                            padding: constants.padding,
-                                            right: 0,
-                                            bottom: 0,
-                                        }}
-                                    >{timeRemaining}</Text>
-                                </View>
-                            );
-                        }}
-                    />
-                </View>
-            )}
-            refreshControl={
-                <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                    colors={[utils.convertColorDataToString(constants.pinkColor)]}
-                />
-            }
-        />
-    );
 }
 
 export const StylizedSelectList = ({
@@ -456,15 +315,15 @@ export const ToggleBox = ({
     height=45,
     title,
     labels=['ВКЛ', 'ВЫКЛ'],
-    backgroundColor=utils.convertColorDataToString(constants.whiteColor),
-    backgroundColorIsTrue=utils.convertColorDataToString(constants.greenColor),
-    backgroundColorIsFalse=utils.convertColorDataToString(constants.pinkColor),
+    backgroundColor=utils.convertColorDataToString(constants.WHITE_COLOR),
+    backgroundColorIsTrue=utils.convertColorDataToString(constants.GREEN_COLOR),
+    backgroundColorIsFalse=utils.convertColorDataToString(constants.PINK_COLOR),
 }) => {
     return (
         <View style={{
                 flexDirection: 'row',
                 justifyContent: 'flex-end',
-                gap: constants.padding,
+                gap: constants.PADDING,
                 alignContent: 'center',
                 alignItems: 'center'
             }}
@@ -472,7 +331,7 @@ export const ToggleBox = ({
             <Text style={{...styles.boxTitleText, fontSize: 16, flexShrink: 1, textAlign: 'right'}}>{title}</Text>
             <TouchableHighlight
                 onPress={!isActive ? () => {} : onPress}
-                underlayColor={utils.convertColorDataToString(constants.whiteColor)}
+                underlayColor={utils.convertColorDataToString(constants.WHITE_COLOR)}
                 style={{
                     ...styles.defaultBox,
                     ...styles.dropShadow,
@@ -487,7 +346,7 @@ export const ToggleBox = ({
                     <Text style={{...styles.toggleBoxText, position: 'absolute', paddingRight: width/2}}>{labels[0]}</Text>
                     <TouchableHighlight
                         onPress={!isActive ? () => {} : onPress}
-                        underlayColor={utils.convertColorDataToString(constants.whiteColor)}
+                        underlayColor={utils.convertColorDataToString(constants.WHITE_COLOR)}
                         style={{
                             ...styles.defaultBox,
                             ...styles.dropShadow,
@@ -510,9 +369,9 @@ export const ToggleBox = ({
 export const CustomButton = ({
     title,
     onPress,
-    textColor=utils.convertColorDataToString(constants.whiteColor),
-    backgroundColor=utils.convertColorDataToString(constants.greenColor),
-    underlayColor=utils.convertColorDataToString(constants.blackColor),
+    textColor=utils.convertColorDataToString(constants.WHITE_COLOR),
+    backgroundColor=utils.convertColorDataToString(constants.GREEN_COLOR),
+    underlayColor=utils.convertColorDataToString(constants.BLACK_COLOR),
     style,
 }) => {
     return (
@@ -523,7 +382,7 @@ export const CustomButton = ({
                 ...styles.defaultBox,
                 ...styles.dropShadow,
                 backgroundColor: backgroundColor,
-                padding: constants.padding,
+                padding: constants.PADDING,
                 ...style
             }}
         >
@@ -536,18 +395,6 @@ export const CustomButton = ({
             >{title}</Text>
         </TouchableHighlight>
     );
-}
-
-export const CheckBox = ({
-    onPress,
-    isChecked=true,
-    isActive=true,
-    width=45,
-    height=45,
-    backgroundColorIsTrue=utils.convertColorDataToString(constants.greenColor),
-    backgroundColorIsFalse=utils.convertColorDataToString(constants.pinkColor),
-}) => {
-
 }
 
 export const CustomDateTimePicker = ({
@@ -620,7 +467,7 @@ export const CustomLine = ({
     height,
     width,
     strokeWidth=1,
-    color=utils.convertColorDataToString(constants.blackColor)
+    color=utils.convertColorDataToString(constants.BLACK_COLOR)
 }) => {
     return (
         <View style={{height: height, width: width}}>
