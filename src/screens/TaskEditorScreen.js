@@ -11,7 +11,7 @@ import { Task } from '../data/models.js'
 import { styles } from '../styles.js';
 
 const db = DatabaseHandler.openDb('HanaHanaDailyLife.db');
-const dbService = new DatabaseHandler(db);
+const dbHandler = new DatabaseHandler(db);
 
 export const TaskEditorScreen = ({navigation, route}) => {
     const canNavigatePreviousPage = route?.params?.canNavigatePreviousPage;
@@ -113,7 +113,7 @@ export const TaskEditorScreen = ({navigation, route}) => {
         setValidationErrors(taskValidation.errors);
 
         if (Object.keys(taskValidation.errors).length === 0) {
-            dbService.insertData('task', newTaskData)
+            dbHandler.insertData('task', newTaskData)
             .then(result => {
                 NotificationsService.scheduleStartTaskNotification({...newTaskData, id: result});
                 NotificationsService.scheduleEndTaskNotification({...newTaskData, id: result});
@@ -143,7 +143,7 @@ export const TaskEditorScreen = ({navigation, route}) => {
             navigation.navigate(prevScreenName);
         }
         else if (Object.keys(taskValidation.errors).length === 0) {
-            dbService.updateData('task', newTaskData);
+            dbHandler.updateData('task', newTaskData);
             NotificationsService.cancelScheduledTaskNotification(newTaskData.id);
             NotificationsService.scheduleStartTaskNotification(newTaskData);
             NotificationsService.scheduleEndTaskNotification(newTaskData);
@@ -159,7 +159,7 @@ export const TaskEditorScreen = ({navigation, route}) => {
                 {
                     text: 'ДА',
                     onPress: () => {
-                        dbService.deleteData('task', taskData.id);
+                        dbHandler.deleteData('task', taskData.id);
                         NotificationsService.cancelScheduledTaskNotification(taskData.id);
                         navigation.navigate(prevScreenName, {isReload: true});
                     },
@@ -239,17 +239,17 @@ export const TaskEditorScreen = ({navigation, route}) => {
     // Получаем категории и активности из БД
     useEffect(() => {
         Promise.all([
-            dbService.getTableData('category'),
-            dbService.getTableData('activity')
+            dbHandler.getTableData('category'),
+            dbHandler.getTableData('activity')
         ])
         .then(([categoryResult, activityResult]) => {
             const categories = categoryResult._array.map(item => ({
-                key: item.id-1,
+                key: item.id - 1,
                 value: item.title,
             }));
             const activities = activityResult._array.map(item => ({
-                category_id: item.category_id-1,
-                key: item.id-1,
+                category_id: item.category_id,
+                key: item.id - 1,
                 value: item.title
             }));
 

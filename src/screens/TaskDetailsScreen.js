@@ -10,7 +10,7 @@ import { DatabaseHandler } from '../data/dbHandler.js';
 import { styles } from '../styles.js';
 
 const db = DatabaseHandler.openDb('HanaHanaDailyLife.db');
-const dbService = new DatabaseHandler(db);
+const dbHandler = new DatabaseHandler(db);
 
 export const TaskDetailsScreen = ({navigation, route}) => {
     const canNavigatePreviousPage = route?.params?.canNavigatePreviousPage;
@@ -41,7 +41,7 @@ export const TaskDetailsScreen = ({navigation, route}) => {
                 {
                     text: 'ДА',
                     onPress: () => {
-                        dbService.deleteData('task', taskData.id);
+                        dbHandler.deleteData('task', taskData.id);
                         NotificationsService.cancelScheduledTaskNotification(taskData.id);
                         navigation.navigate(prevScreenName, {isReload: true});
                     },
@@ -63,7 +63,7 @@ export const TaskDetailsScreen = ({navigation, route}) => {
                     {
                         text: 'ДА',
                         onPress: () => {
-                            dbService.updateData('task', {id: taskData.id, ended_at: currentDate.getTime()});
+                            dbHandler.updateData('task', {id: taskData.id, ended_at: currentDate.getTime()});
                             NotificationsService.cancelScheduledTaskNotification(taskData.id);
                             navigation.navigate(prevScreenName, {isReload: true});
                         },
@@ -134,8 +134,8 @@ export const TaskDetailsScreen = ({navigation, route}) => {
     // Получаем категории и активности из БД
     useEffect(() => {
         Promise.all([
-            dbService.getTableData('category'),
-            dbService.getTableData('activity')
+            dbHandler.getTableData('category'),
+            dbHandler.getTableData('activity')
         ])
         .then(([categoryResult, activityResult]) => {
             const categories = categoryResult._array.map(item => {return {...item, id: item.id - 1}});

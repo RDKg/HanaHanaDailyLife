@@ -195,12 +195,18 @@ export const saveAvatar = async (path) => {
     }
 }
 
-export function getRandomDateInYear(year) {
+export const getRandomDateInYear = (year) => {
     const startDate = new Date(`${year}-01-01T00:00:00Z`);
     const endDate = new Date(`${year + 1}-01-01T00:00:00Z`);
     const randomTime = startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime());
 
     return new Date(randomTime);
+}
+
+export const random = (a, b, precision=1) => {
+    const number = Math.random() * (a - b) + b;
+
+    return Math.round(number * (10 ** precision)) / (10 ** precision);
 }
 
 export const svgXmlStringsObject = {

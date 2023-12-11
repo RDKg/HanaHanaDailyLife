@@ -15,7 +15,7 @@ import HistorySVG from '../../assets/ico/history-ico.svg';
 const Stack = createNativeStackNavigator();
 
 const db = DatabaseHandler.openDb('HanaHanaDailyLife.db');
-const dbService = new DatabaseHandler(db);
+const dbHandler = new DatabaseHandler(db);
 
 export const TaskTabNavigator = ({route}) => {
     const canNavigatePreviousPage = route?.params?.canNavigatePreviousPage;
@@ -57,9 +57,9 @@ export const TasksScreen = ({navigation, route}) => {
         ];
 
         Promise.all([
-            dbService.getTableData('category'),
-            dbService.getTableData('activity'),
-            dbService.getTableData(
+            dbHandler.getTableData('category'),
+            dbHandler.getTableData('activity'),
+            dbHandler.getTableData(
                 'task', 
                 {orderBy: 'started_at', typeOrder: 'ASC'},
                 condition,

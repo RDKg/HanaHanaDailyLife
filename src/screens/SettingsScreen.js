@@ -10,7 +10,7 @@ import { styles } from '../styles.js';
 import { NotificationsService, MediaLibraryService } from '../deviceFeatures.js';
 
 const db = DatabaseHandler.openDb('HanaHanaDailyLife.db');
-const dbService = new DatabaseHandler(db);
+const dbHandler = new DatabaseHandler(db);
 
 export const SettingsScreen = ({ navigation, route }) => {
     const canNavigatePreviousPage = route?.params?.canNavigatePreviousPage;
@@ -40,7 +40,7 @@ export const SettingsScreen = ({ navigation, route }) => {
     }
 
     const fetchTasksNotificationsData = async () => {
-        const tasksData = await dbService.getTableData(
+        const tasksData = await dbHandler.getTableData(
             'task',
             [
                 {field: 'started_at', comparison: '>=', value: currentDate.getTime()},

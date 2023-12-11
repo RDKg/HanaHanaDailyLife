@@ -14,7 +14,7 @@ import { TaskDetailsScreen } from './TaskDetailsScreen.js';
 const Stack = createNativeStackNavigator();
 
 const db = DatabaseHandler.openDb('HanaHanaDailyLife.db');
-const dbService = new DatabaseHandler(db);
+const dbHandler = new DatabaseHandler(db);
 
 export const ProfileTabNavigator = ({ route }) => {
     const canNavigatePreviousPage = route?.params?.canNavigatePreviousPage;
@@ -63,9 +63,9 @@ export const ProfileScreen = ({ navigation, route }) => {
         const tasks = [];
         
         Promise.all([
-            dbService.getTableData('category'),
-            dbService.getTableData('activity'),
-            dbService.getTableData(
+            dbHandler.getTableData('category'),
+            dbHandler.getTableData('activity'),
+            dbHandler.getTableData(
                 'task', 
                 {orderBy: 'started_at', typeOrder: 'ASC'},
                 [

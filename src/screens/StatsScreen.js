@@ -9,7 +9,7 @@ import { DatabaseHandler } from '../data/dbHandler.js';
 import { styles } from '../styles.js';
 
 const db = DatabaseHandler.openDb('HanaHanaDailyLife.db');
-const dbService = new DatabaseHandler(db);
+const dbHandler = new DatabaseHandler(db);
 
 export const StatsScreen = ({ navigation, route }) => {
     const canNavigatePreviousPage = route?.params?.canNavigatePreviousPage;

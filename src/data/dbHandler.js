@@ -10,23 +10,24 @@ export class DatabaseHandler {
         return new Promise((resolve, reject) => {
             this.isTableCreated(tableName)
             .then(result => {
-                if (result) {
-                    this.db.transaction(tx => {
-                        tx.executeSql(
-                            `DROP TABLE ${tableName};`, 
-                            [], 
-                            (_, result) => {
-                                resolve(`Таблица ${tableName} удалена.`)
-                            },
-                            (_, error) => {
-                                reject(error)
-                            }
-                        );
-                    });
+                if (!result) {
+                    reject(`The [${tableName}] table doesn't exists!`);
+
+                    return;
                 }
-                else {
-                    reject(`Таблицы ${tableName} не существует.`);
-                }
+
+                this.db.transaction(tx => {
+                    tx.executeSql(
+                        `DROP TABLE ${tableName};`, 
+                        [], 
+                        (_, result) => {
+                            resolve(result);
+                        },
+                        (_, error) => {
+                            reject(`Table deletion error [${tableName}]: ${error}`);
+                        }
+                    )
+                });
             });
         })
     }
@@ -41,7 +42,7 @@ export class DatabaseHandler {
                         resolve(result.rows.length != 0);
                     },
                     (_, error) => {
-                        reject(error);
+                        reject(`Error checking the existence of the table [${tableName}]: ${error}`);
                     }
                 )
             });
@@ -86,35 +87,32 @@ export class DatabaseHandler {
         return new Promise((resolve, reject) => {
             this.isTableCreated(tableName)
             .then(result => {
-                if (result) {
-                    this.db.transaction(tx => {
-                        const query = `
-                            SELECT * FROM ${tableName} 
-                            ${conditionString}
-                            ${orderString}
-                            ${countString};
-                        `;
+                if (!result) {
+                    reject(`The [${tableName}] table doesn't exists!`);
 
-                        tx.executeSql(
-                            query, 
-                            [], 
-                            (_, result) => {
-                                resolve(result.rows);
-                            },
-                            (_, error) => {
-                                reject(error)
-                            }
-                        );
-                    })
+                    return;
                 }
-                else {
-                    reject(`Таблицы ${tableName} не существует.`);
-                }
+
+                this.db.transaction(tx => {
+                    tx.executeSql(
+                        `SELECT * FROM ${tableName} 
+                        ${conditionString}
+                        ${orderString}
+                        ${countString};`, 
+                        [], 
+                        (_, result) => {
+                            resolve(result.rows);
+                        },
+                        (_, error) => {
+                            reject(`Error getting data from the [${tableName}] table: ${error}`);
+                        }
+                    );
+                })
             });
         })
     }
 
-    async removeEntry(tableName, ids) {
+    async removeEntries(tableName, ids) {
         if (typeof ids !== 'object') {
             ids = [ids];
         }
@@ -122,23 +120,24 @@ export class DatabaseHandler {
         return new Promise((resolve, reject) => {
             this.isTableCreated(tableName)
             .then(result => {
-                if (result) {
-                    this.db.transaction(tx => {
-                        tx.executeSql(
-                            `DELETE FROM ${tableName} WHERE id IN (${ids.join(',')})`, 
-                            [], 
-                            (_, result) => {
-                                resolve(`Таблица ${tableName} удалена.`)
-                            },
-                            (_, error) => {
-                                reject(error)
-                            }
-                        );
-                    });
+                if (!result) {
+                    reject(`The [${tableName}] table doesn't exists!`);
+
+                    return;
                 }
-                else {
-                    reject(`Таблицы ${tableName} не существует.`);
-                }
+
+                this.db.transaction(tx => {
+                    tx.executeSql(
+                        `DELETE FROM ${tableName} WHERE id IN (${ids.join(',')})`, 
+                        [], 
+                        (_, result) => {
+                            resolve(result);
+                        },
+                        (_, error) => {
+                            reject(`Error deleting records from the [${tableName}] table: ${error}`);
+                        }
+                    );
+                });
             });
         })
     }
@@ -147,23 +146,24 @@ export class DatabaseHandler {
         return new Promise((resolve, reject) => {
             this.isTableCreated(tableName)
             .then(result => {
-                if (result) {
-                    this.db.transaction(tx => {
-                        tx.executeSql(
-                            `DELETE FROM ${tableName} WHERE id = ${id}`, 
-                            [],
-                            (_, result) => {
-                                resolve(`Запись в Таблице ${tableName} успешно удалена: ${result}`)
-                            },
-                            (_, error) => {
-                                reject(`Ошибка удаления записи в Таблице ${tableName}: ${error}`);
-                            }
-                        );
-                    });
+                if (!result) {
+                    reject(`The [${tableName}] table doesn't exists!`);
+
+                    return;
                 }
-                else {
-                    reject(`Таблицы ${tableName} не существует.`);
-                }
+
+                this.db.transaction(tx => {
+                    tx.executeSql(
+                        `DELETE FROM ${tableName} WHERE id = ${id}`, 
+                        [],
+                        (_, result) => {
+                            resolve(true);
+                        },
+                        (_, error) => {
+                            reject(`Error deleting a record from the [${tableName}] table: ${error}`);
+                        }
+                    );
+                });
             });
         });
     }
@@ -172,28 +172,29 @@ export class DatabaseHandler {
         return new Promise((resolve, reject) => {
             this.isTableCreated(tableName)
             .then(result => {
-                if (result) {
-                    const keys = Object.keys(data).join(', ');
-                    const values = Object.values(data);
-                    const placeholders = values.map(item => '?').join(', ');
-                    const insertQuery = `INSERT INTO ${tableName} (${keys}) VALUES (${placeholders});`;
+                if (!result) {
+                    reject(`The [${tableName}] table doesn't exists!`);
 
-                    this.db.transaction(tx => {
-                        tx.executeSql(
-                            insertQuery, 
-                            values,
-                            (_, result) => {
-                                resolve(result.insertId);
-                            },
-                            (_, error) => {
-                                reject(`Ошибка добавления записи в Таблицу ${tableName}: ${error}`);
-                            }
-                        );
-                    });
+                    return;
                 }
-                else {
-                    reject(`Таблицы ${tableName} не существует.`);
-                }
+
+                const keys = Object.keys(data).join(', ');
+                const values = Object.values(data);
+                const placeholders = values.map(item => '?').join(', ');
+                const insertQuery = `INSERT INTO ${tableName} (${keys}) VALUES (${placeholders});`;
+
+                this.db.transaction(tx => {
+                    tx.executeSql(
+                        insertQuery, 
+                        values,
+                        (_, result) => {
+                            resolve(result.insertId);
+                        },
+                        (_, error) => {
+                            reject(`Error adding an entry to the [${tableName}] table: ${error}`);
+                        }
+                    );
+                });
             });
         });
     }
@@ -202,34 +203,31 @@ export class DatabaseHandler {
         return new Promise((resolve, reject) => {
             this.isTableCreated(tableName)
             .then(result => {
-                if (result) {
-                    const dataWithoutID = Object.fromEntries(
-                        Object.entries(data).filter(item => {
-                            if (item[0] !== 'id') {
-                                return true;
-                            }
-                        })
-                    );
-                    const keys = Object.keys(dataWithoutID).map(item => `${item} = ?`).join(', ');
-                    const values = [...Object.values(dataWithoutID), data.id];
-                    const insertQuery = `UPDATE ${tableName} SET ${keys} WHERE id = ?;`;
+                if (!result) {
+                    reject(`The [${tableName}] table doesn't exists!`);
 
-                    this.db.transaction(tx => {
-                        tx.executeSql(
-                            insertQuery, 
-                            values,
-                            (_, result) => {
-                                resolve(`Запись в Таблице ${tableName} успешно обновлена: ${result}`)
-                            },
-                            (_, error) => {
-                                reject(`Ошибка обновления записи в Таблице ${tableName}: ${error}`);
-                            }
-                        );
-                    });
+                    return;
                 }
-                else {
-                    reject(`Таблицы ${tableName} не существует.`);
-                }
+
+                const dataWithoutID = Object.fromEntries(
+                    Object.entries(data).filter(item => item[0] !== 'id')
+                );
+                const keys = Object.keys(dataWithoutID).map(item => `${item} = ?`).join(', ');
+                const values = [...Object.values(dataWithoutID), data.id];
+                const insertQuery = `UPDATE ${tableName} SET ${keys} WHERE id = ?;`;
+
+                this.db.transaction(tx => {
+                    tx.executeSql(
+                        insertQuery, 
+                        values,
+                        (_, result) => {
+                            resolve(result);
+                        },
+                        (_, error) => {
+                            reject(`Error updating a record in the [${tableName}] table: ${error}`);
+                        }
+                    );
+                });
             });
         });
     }
@@ -244,89 +242,104 @@ export class DatabaseHandler {
                         resolve(result.rows);
                     },
                     (_, error) => {
-                        reject(`Ошибка получения названия всех таблиц: ${error}`);
+                        reject(`Error getting the names of all tables: ${error}`);
                     }
                 );
             })
         });
     }
 
-    async createAndInsertDefaultData() {
+    static openDb(name) {
+        return SQLite.openDatabase(name);
+    }
+}
+
+export class DatabaseService extends DatabaseHandler {
+    constructor(db) {
+        super(db);
+    }
+
+    async createAndInsertDefaultCategories() {
         return new Promise((resolve, reject) => {
-            const isCreated = async () => {
-                const isCategoryTableCreated = await this.isTableCreated('category');
-                const isActivityTableCreated = await this.isTableCreated('activity');
+            this.db.transaction(tx => {
+                const keys = Object.keys(constants.DEFAULT_DATABASE_DATA);
+                const placeholders = keys.map(() => '(?, ?)').join(', ');
+                const categories = keys.flatMap(item => {
+                    return [
+                        constants.DEFAULT_DATABASE_DATA[item].title,
+                        constants.DEFAULT_DATABASE_DATA[item].avatar
+                    ];
+                });
 
-                return isCategoryTableCreated && isActivityTableCreated;
-            } 
+                tx.executeSql(
+                    `CREATE TABLE IF NOT EXISTS category (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        title TEXT UNQIUE, 
+                        avatar TEXT
+                    );`,
+                    [],
+                    (_, result) => {},
+                    (_, error) => {
+                        reject(`Error creating the [category] table: ${error}`);
+                    }
+                );
 
-            isCreated().then(result => {
-                if (result == false) { 
-                    this.db.transaction(tx => {
-                        tx.executeSql(
-                            `CREATE TABLE IF NOT EXISTS category (
-                                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                title TEXT UNIQUE, 
-                                avatar TEXT
-                            );`
-                        );
-                        tx.executeSql(
-                            `CREATE TABLE IF NOT EXISTS activity (
-                                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                title TEXT,
-                                category_id INTEGER,
-                                FOREIGN KEY (category_id) REFERENCES category(id)
-                            );`
-                        );
-                
-                        const categoryValues = Object.values(constants.DEFAULT_DATABASE_DATA);
-                        const categoryInsertQuery = 'INSERT OR IGNORE INTO category (title, avatar) VALUES ' + 
-                        categoryValues.map(() => '(?, ?)').join(', ') + ';';
-                        const categoryInsertParams = categoryValues.flatMap(category => [category.title, category.avatar]);
-            
-                        tx.executeSql(
-                            categoryInsertQuery, 
-                            categoryInsertParams,
-                            (_, result) => {
-                                const category_ids = {};
-            
-                                for (let i = 1; i < categoryValues.length + 1; i++) {
-                                    category_ids[categoryValues[i-1].title] = i;
-                                }
-                
-                                const activityValues = [];
-                
-                                categoryValues.forEach(category => {
-                                    const category_id = category_ids[category.title];
-                                    const activities = category.activities || [];
-                
-                                    activities.forEach(activity => {
-                                        activityValues.push({title: activity, category_id: category_id})
-                                    });
-                                });
-                
-                                const activityInsertQuery = 'INSERT OR IGNORE INTO activity (title, category_id) VALUES ' +
-                                activityValues.map(() => '(?, ?)').join(', ') + ';';
-                                const activityInsertParams = activityValues.flatMap(activity => [
-                                    activity.title,
-                                    activity.category_id,
-                                ]);
+                tx.executeSql(
+                    `INSERT INTO category (title, avatar) VALUES ${placeholders};`,
+                    categories, 
+                    (_, result) => {},
+                    (_, error) => {
+                        reject(`Error when inserting data into the [category] table: ${error}`);
+                    }
+                );
 
-                                tx.executeSql(activityInsertQuery, activityInsertParams);
+                resolve(true);
+            });
+        })
+    }
 
-                                resolve(true);
-                            },
-                            (_, error) => {
-                                reject(`Произошла ошибка во время добавления записи в category: ${error}`);
-                            }
-                        );
-                    });
-                }
-                else {
-                    resolve(false);
-                }
-            })
+    async createAndInsertDefaultActivities() {
+        return new Promise((resolve, reject) => {
+            this.db.transaction(tx => {
+                const values = Object.entries(constants.DEFAULT_DATABASE_DATA);
+                const activities = values.flatMap(item => 
+                    item[1].activities.flatMap(title => [title, item[0]])
+                );
+                const placeholders = activities
+                    .slice(0, activities.length / 2)
+                    .map(() => '(?, ?)')
+                    .join(', ');
 
+                tx.executeSql(
+                    `CREATE TABLE IF NOT EXISTS activity (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        title TEXT,
+                        category_id INTEGER,
+                        FOREIGN KEY (category_id) REFERENCES category(id)
+                    );`,
+                    [],
+                    (_, result) => {},
+                    (_, error) => {
+                        reject(`Error creating the [activity] table: ${error}`);
+                    }
+                );
+
+                tx.executeSql(
+                    `INSERT INTO activity (title, category_id) VALUES ${placeholders};`,
+                    activities, 
+                    (_, result) => {},
+                    (_, error) => {
+                        reject(`Error when inserting data into the [activity] table: ${error}`);
+                    }
+                );
+
+                resolve(true);
+            });
+        })
+    }
+
+    async createTask() {
+        return new Promise((resolve, reject) => {
             this.db.transaction(tx => {
                 tx.executeSql(
                     `CREATE TABLE IF NOT EXISTS task (
@@ -349,13 +362,35 @@ export class DatabaseHandler {
                         is_deleted BOOLEAN DEFAULT false,
                         FOREIGN KEY (category_id) REFERENCES category(id),
                         FOREIGN KEY (activity_id) REFERENCES activity(id)
-                    );`
+                    );`,
+                    [],
+                    (_, result) => {},
+                    (_, error) => {
+                        reject(`Error creating the [task] table: ${error}`);
+                    }
                 );
-            })
+    
+                resolve(true);
+            });
         })
-    } 
+    }
 
-    static openDb(name) {
-        return SQLite.openDatabase(name);
+    async initializeDatabase() {
+        Promise.all([
+            this.isTableCreated('category'),
+            this.isTableCreated('activity'),
+            this.isTableCreated('task')
+        ])
+        .then(([isCategoryCreated, isActivityCreated, isTaskCreated]) => {
+            if (!isCategoryCreated) {
+                this.createAndInsertDefaultCategories();
+            }
+            if (!isActivityCreated) {
+                this.createAndInsertDefaultActivities();
+            }
+            if (!isTaskCreated) {
+                this.createTask();
+            }
+        });
     }
 }
