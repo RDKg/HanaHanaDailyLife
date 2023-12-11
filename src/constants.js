@@ -18,18 +18,6 @@ import walkTaskAvatar from '../assets/ico/tasks/walk-task-avatar.svg';
 import workTaskAvatar from '../assets/ico/tasks/work-task-avatar.svg';
 import addTaskAvatar from '../assets/ico/tasks/add-task-avatar.svg';
 
-export const FONT_FILES = {
-    RalewayThin: require('../assets/fonts/Raleway-Thin.ttf'),
-    RalewayExtraLight: require('../assets/fonts/Raleway-ExtraLight.ttf'),
-    RalewayLight: require('../assets/fonts/Raleway-Light.ttf'),
-    RalewayRegular: require('../assets/fonts/Raleway-Regular.ttf'),
-    RalewayMedium: require('../assets/fonts/Raleway-Medium.ttf'),
-    RalewaySemiBold: require('../assets/fonts/Raleway-SemiBold.ttf'),
-    RalewayBold: require('../assets/fonts/Raleway-Bold.ttf'),
-    RalewayExtraBold: require('../assets/fonts/Raleway-ExtraBold.ttf'),
-    RalewayBlack: require('../assets/fonts/Raleway-Black.ttf'),
-};
-
 export const TASKS_AVATARS = {
     adventureTaskAvatar,
     anotherTaskAvatar,
@@ -50,6 +38,18 @@ export const TASKS_AVATARS = {
     walkTaskAvatar,
     workTaskAvatar,
     addTaskAvatar,
+};
+
+export const FONT_FILES = {
+    RalewayThin: require('../assets/fonts/Raleway-Thin.ttf'),
+    RalewayExtraLight: require('../assets/fonts/Raleway-ExtraLight.ttf'),
+    RalewayLight: require('../assets/fonts/Raleway-Light.ttf'),
+    RalewayRegular: require('../assets/fonts/Raleway-Regular.ttf'),
+    RalewayMedium: require('../assets/fonts/Raleway-Medium.ttf'),
+    RalewaySemiBold: require('../assets/fonts/Raleway-SemiBold.ttf'),
+    RalewayBold: require('../assets/fonts/Raleway-Bold.ttf'),
+    RalewayExtraBold: require('../assets/fonts/Raleway-ExtraBold.ttf'),
+    RalewayBlack: require('../assets/fonts/Raleway-Black.ttf'),
 };
 
 export const DEFAULT_DATABASE_DATA = {

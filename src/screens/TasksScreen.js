@@ -7,6 +7,7 @@ import * as constants from '../constants.js';
 import * as components from '../components.js';
 import * as utils from '../utils.js';
 import { NotificationsService, LocationService } from '../deviceFeatures.js';
+import { BackgroundTaskManager } from '../backgroundTaskManager.js';
 import { DatabaseHandler } from '../data/dbHandler.js';
 import { Task } from '../data/models.js'
 import { styles } from '../styles.js';
@@ -19,7 +20,7 @@ const db = DatabaseHandler.openDb('HanaHanaDailyLife.db');
 const dbService = new DatabaseHandler(db);
 
 export const TaskTabNavigator = ({route}) => {
-    const withGoBack = route?.params?.withGoBack;
+    const canNavigatePreviousPage = route?.params?.canNavigatePreviousPage;
 
     return (
         <Stack.Navigator
@@ -30,7 +31,7 @@ export const TaskTabNavigator = ({route}) => {
                 }
             }
         >
-            <Stack.Screen name='HomeTask' component={TasksScreen} initialParams={{withGoBack}}/>
+            <Stack.Screen name='HomeTask' component={TasksScreen} initialParams={{canNavigatePreviousPage, isReload: true}}/>
             <Stack.Screen name='TaskEditor' component={TaskEditorScreen}/>
             <Stack.Screen name='TaskDetails' component={TaskDetailsScreen}/>
         </Stack.Navigator>
@@ -38,10 +39,10 @@ export const TaskTabNavigator = ({route}) => {
 }
 
 export const TasksScreen = ({navigation, route}) => {
-    const withGoBack = route?.params?.withGoBack;
+    const canNavigatePreviousPage = route?.params?.canNavigatePreviousPage;
     const currentDate = new Date();
     const itemsPerPage = 10;
-
+    
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [isDataLoaded, setIsDataLoaded] = useState(false);
     const [isShowingCompleted, setIsShowingCompleted] = useState(false);
@@ -146,7 +147,7 @@ export const TasksScreen = ({navigation, route}) => {
         <View style={styles.mainContainer}>
             <components.BackgroundImage/>
             { 
-                withGoBack &&
+                canNavigatePreviousPage &&
                 <components.NavigatePreviousScreenButton onPress={() => navigation.goBack()}/>
             }
             <TouchableHighlight 
@@ -181,7 +182,7 @@ export const TasksScreen = ({navigation, route}) => {
                 >
                     <View style={{...styles.mainContainerDefault}}>
                         <components.TaskButton
-                            onPress={() => navigation.navigate('TaskEditor', {withGoBack: true, prevScreenName: 'HomeTask'})}
+                            onPress={() => navigation.navigate('TaskEditor', {canNavigatePreviousPage: true, prevScreenName: 'HomeTask'})}
                             AvatarComponent={constants.TASKS_AVATARS.addTaskAvatar}
                             title={'Добавить новый план'}
                         />
@@ -201,7 +202,7 @@ export const TasksScreen = ({navigation, route}) => {
 }
 
 export const TaskEditorScreen = ({navigation, route}) => {
-    const withGoBack = route?.params?.withGoBack;
+    const canNavigatePreviousPage = route?.params?.canNavigatePreviousPage;
     const prevScreenName = route.params?.prevScreenName;
     const taskData = route?.params?.data;
     const currentDate = new Date();
@@ -304,6 +305,14 @@ export const TaskEditorScreen = ({navigation, route}) => {
             .then(result => {
                 NotificationsService.scheduleStartTaskNotification({...newTaskData, id: result});
                 NotificationsService.scheduleEndTaskNotification({...newTaskData, id: result});
+
+                // BackgroundTaskManager.defineBackgroundTask(`task-${result}`, () => {
+                    
+                // });
+                // BackgroundTaskManager.registerBackgroundTask(`task-${result}`, {
+                //     minimumInterval: newTaskData.started_at - currentDate.getTime(),
+                //     endTimeout: endDate.getTime()
+                // })
             });
             navigation.navigate(prevScreenName, {isReload: true});
         }
@@ -363,7 +372,7 @@ export const TaskEditorScreen = ({navigation, route}) => {
     useEffect(() => {
         if (isCheckingLocationSettings === true) {
             LocationService.checkLocationPermissionsAndStatus()
-            .then(({ isBackgroundGranted, isForegroundGranted, isLocationEnabled }) => {
+            .then(({isBackgroundGranted, isForegroundGranted, isLocationEnabled}) => {
                 setLocationSettingsData({
                     isForegroundGranted,
                     isBackgroundGranted,
@@ -500,7 +509,7 @@ export const TaskEditorScreen = ({navigation, route}) => {
         <View style={styles.mainContainer}>
             <components.BackgroundImage/>
             { 
-                withGoBack &&
+                canNavigatePreviousPage &&
                 <components.NavigatePreviousScreenButton onPress={() => navigation.goBack()}/>
             }
             {
@@ -702,7 +711,7 @@ export const TaskEditorScreen = ({navigation, route}) => {
                                 onPress={() => {setIsMapEnabled(!isMapEnabled)}}
                                 title='Использование карты'
                                 isChecked={locationSettingsData.isForegroundGranted && isMapEnabled}
-                                isActive={locationSettingsData.isForegroundGranted && isMapEnabled}
+                                isActive={locationSettingsData.isForegroundGranted}
                             />
                         </View>
                         <View style={{width: '100%', justifyContent: 'flex-end'}}>
@@ -746,7 +755,7 @@ export const TaskEditorScreen = ({navigation, route}) => {
 }
  
 export const TaskDetailsScreen = ({navigation, route}) => {
-    const withGoBack = route?.params?.withGoBack;
+    const canNavigatePreviousPage = route?.params?.canNavigatePreviousPage;
     const prevScreenName = route.params?.prevScreenName;
     const taskData = route?.params?.data;
     const currentDate = new Date();
@@ -896,7 +905,7 @@ export const TaskDetailsScreen = ({navigation, route}) => {
         <View style={styles.mainContainer}>
             <components.BackgroundImage/>
             { 
-                withGoBack &&
+                canNavigatePreviousPage &&
                 <components.NavigatePreviousScreenButton onPress={() => navigation.goBack()}/>
             }
             {

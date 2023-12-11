@@ -1,3 +1,5 @@
+import * as FileSystem from 'expo-file-system';
+
 import * as constants from './constants.js';
 
 const gradientDefString = `
@@ -167,6 +169,29 @@ export const getTimeRemaining = (startDate, endDate) => {
     }
     else {
         return Math.floor(seconds / 86400) + 'Д';
+    }
+}
+
+export const saveAvatar = async (path) => {
+    try {
+        const regex = /([^\/]+)$/;
+        const match = path.match(regex);
+
+        if (match) {
+            const newPath = `${FileSystem.documentDirectory}${match[0]}`;
+        
+            await FileSystem.moveAsync({
+                from: path,
+                to: newPath
+            });
+
+            return newPath;
+        }
+    
+        throw match;
+    }
+    catch (error) {
+        console.error(`Ошибка сохранения изображения: ${error}`);
     }
 }
 

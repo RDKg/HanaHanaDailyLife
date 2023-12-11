@@ -22,6 +22,33 @@ const db = DatabaseHandler.openDb('HanaHanaDailyLife.db');
 const dbService = new DatabaseHandler(db);
 dbService.createAndInsertDefaultData();  
 
+// function getRandomDateInYear(year) {
+//     const startDate = new Date(`${year}-01-01T00:00:00Z`);
+//     const endDate = new Date(`${year + 1}-01-01T00:00:00Z`);
+//     const randomTime = startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime());
+//     return new Date(randomTime);
+//   }
+
+// for (let i = 0; i < 23; i++) {
+//     const d = getRandomDateInYear(2007);
+//     dbService.insertData('task', {
+//         title: 'wrvwr',
+//         description: 'werwer', 
+//         budget: Math.random() * (10000 - 1000) + 1000,
+//         route: null,
+//         is_route_following: null,
+//         is_map_enabled: null,
+//         start_latitude: null,
+//         start_longitude: null,
+//         end_latitude: null,
+//         end_longitude: null,
+//         created_at: d.getTime(),
+//         started_at: d.getTime(),
+//         ended_at: d.getTime()+500,
+//         category_id: 1,
+//         activity_id: 1
+//     })
+// }
 const Tab = createBottomTabNavigator();
 
 NotificationsService.registerForPushNotifications(); 

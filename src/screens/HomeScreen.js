@@ -33,9 +33,9 @@ export const HomeTabNavigator = () => {
             }
         >
             <Stack.Screen name='Home' component={HomeScreen}/>
-            <Stack.Screen name='Profile' component={ProfileTabNavigator}/>
+            <Stack.Screen name='Profile' component={ProfileTabNavigator} initialParams={{canNavigatePreviousPage: true}}/>
             <Stack.Screen name='Settings' component={SettingsScreen}/>
-            <Stack.Screen name='Tasks' component={TaskTabNavigator} initialParams={{withGoBack: true}}/>
+            <Stack.Screen name='Tasks' component={TaskTabNavigator} initialParams={{canNavigatePreviousPage: true}}/>
             <Stack.Screen name='Stats' component={StatsScreen}/>
             <Stack.Screen name='About' component={AboutScreen}/>
         </Stack.Navigator>
@@ -58,7 +58,7 @@ export const HomeScreen = ({navigation}) => {
                         maxHeight: heightForSquareProfileButton
                     }}>
                     <TouchableHighlight 
-                        onPress={() => navigation.navigate('Profile', {withGoBack: true})} 
+                        onPress={() => navigation.navigate('Profile', {canNavigatePreviousPage: true})} 
                         underlayColor={utils.convertColorDataToString(constants.GRAY_COLOR)}
                         style={
                             {
@@ -96,7 +96,7 @@ export const HomeScreen = ({navigation}) => {
                     </TouchableHighlight>
                     <View style={{flex: 1, gap: constants.MARGIN}}>
                         <TouchableHighlight 
-                            onPress={() => navigation.navigate('Settings', {withGoBack: true})} 
+                            onPress={() => navigation.navigate('Settings', {canNavigatePreviousPage: true})} 
                             underlayColor={utils.convertColorDataToString(constants.GRAY_COLOR)}
                             style={{
                                 ...styles.defaultBox, 
@@ -127,7 +127,7 @@ export const HomeScreen = ({navigation}) => {
                             </>
                         </TouchableHighlight>
                         <TouchableHighlight 
-                            onPress={() => navigation.navigate('Tasks', {withGoBack: true})} 
+                            onPress={() => navigation.navigate('Tasks', {canNavigatePreviousPage: true})} 
                             underlayColor={utils.convertColorDataToString(constants.GRAY_COLOR)}
                             style={{
                                 ...styles.defaultBox, 
@@ -163,7 +163,7 @@ export const HomeScreen = ({navigation}) => {
                 </View>
                 <View style={{gap: constants.MARGIN}}>
                     <TouchableHighlight 
-                        onPress={() => navigation.navigate('Stats', {withGoBack: true})} 
+                        onPress={() => navigation.navigate('Stats', {canNavigatePreviousPage: true})} 
                         underlayColor={utils.convertColorDataToString(constants.GRAY_COLOR)}
                         style={{
                             ...styles.defaultBox, 
@@ -174,7 +174,7 @@ export const HomeScreen = ({navigation}) => {
                         <Text style={styles.defaultTextButton}>СТАТИСТИКА</Text>
                     </TouchableHighlight>
                     <TouchableHighlight 
-                        onPress={() => navigation.navigate('About', {withGoBack: true})} 
+                        onPress={() => navigation.navigate('About', {canNavigatePreviousPage: true})} 
                         underlayColor={utils.convertColorDataToString(constants.GRAY_COLOR)}
                         style={{
                             ...styles.defaultBox, 

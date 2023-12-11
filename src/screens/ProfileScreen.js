@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { SafeAreaView, Text, View, RefreshControl, ImageBackground, ScrollView } from 'react-native';
+import { SafeAreaView, Text, View, RefreshControl, ImageBackground, ScrollView, Image } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import * as constants from '../constants.js';
@@ -17,7 +17,7 @@ const db = DatabaseHandler.openDb('HanaHanaDailyLife.db');
 const dbService = new DatabaseHandler(db);
 
 export const ProfileTabNavigator = ({ route }) => {
-    const withGoBack = route?.params?.withGoBack;
+    const canNavigatePreviousPage = route?.params?.canNavigatePreviousPage;
 
     return (
         <Stack.Navigator
@@ -28,7 +28,7 @@ export const ProfileTabNavigator = ({ route }) => {
                 }
             }
         >
-            <Stack.Screen name='HomeProfile' component={ProfileScreen} initialParams={{withGoBack}}/>
+            <Stack.Screen name='HomeProfile' component={ProfileScreen} initialParams={{canNavigatePreviousPage, isReload: true}}/>
             <Stack.Screen name='TaskEditor' component={TaskEditorScreen}/>
             <Stack.Screen name='TaskDetails' component={TaskDetailsScreen}/>
         </Stack.Navigator>
@@ -36,11 +36,12 @@ export const ProfileTabNavigator = ({ route }) => {
 }
 
 export const ProfileScreen = ({ navigation, route }) => {
-    const withGoBack = route?.params?.withGoBack;
+    const canNavigatePreviousPage = route?.params?.canNavigatePreviousPage;
     const currentDate = new Date();
     const itemsPerPage = 10;
     
     const [username, setUsername] = useState();
+    const [avatar, setAvatar] = useState();
 
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [isDataLoaded, setIsDataLoaded] = useState(false);
@@ -72,9 +73,16 @@ export const ProfileScreen = ({ navigation, route }) => {
                     {field: 'ended_at', comparison: '>=', value: currentDate.getTime()}
                 ]
             ),
-            LocalStorageHandler.getStorageItem('username')
+            LocalStorageHandler.getStorageItem('username'),
+            LocalStorageHandler.getStorageItem('avatar')
         ])
-        .then(([categoryResult, activityResult, tasksResult, usernameResult]) => {
+        .then(([
+            categoryResult, 
+            activityResult, 
+            tasksResult, 
+            usernameResult, 
+            avatarResult
+        ]) => {
             const categories = categoryResult._array.map(item => ({
                 key: item.id,
                 value: item.title,
@@ -125,6 +133,7 @@ export const ProfileScreen = ({ navigation, route }) => {
             });
             setIsDataLoaded(true);
             setUsername(usernameResult);
+            setAvatar(avatarResult);
         });
     };
 
@@ -152,7 +161,7 @@ export const ProfileScreen = ({ navigation, route }) => {
         <View style={styles.mainContainer}>
             <components.BackgroundImageProfile/>
             { 
-                withGoBack &&
+                canNavigatePreviousPage &&
                 <components.NavigatePreviousScreenButton onPress={() => navigation.goBack()}/>
             }
             <SafeAreaView style={{gap: constants.MARGIN, position: 'relative', flex: 1}}>
@@ -198,9 +207,10 @@ export const ProfileScreen = ({ navigation, route }) => {
                         style={{
                             backgroundColor: utils.convertColorDataToString(constants.WHITE_COLOR),
                             borderRadius: constants.BORDER_RADIUS,
+                            overflow: 'hidden'
                         }}
                     >
-                        <ImageBackground/>
+                        <Image source={{uri: avatar}} style={{aspectRatio: 1}}/>
                     </View>
                     <Text style={{
                             ...styles.screenTitleText,
@@ -224,7 +234,7 @@ export const ProfileScreen = ({ navigation, route }) => {
                 >
                     <View style={{...styles.mainContainerDefault}}>
                         <components.TaskButton
-                            onPress={() => navigation.navigate('TaskEditor', {withGoBack: true, prevScreenName: 'HomeProfile'})}
+                            onPress={() => navigation.navigate('TaskEditor', {canNavigatePreviousPage: true, prevScreenName: 'HomeProfile'})}
                             AvatarComponent={constants.TASKS_AVATARS.addTaskAvatar}
                             title={'Добавить новый план'}
                         />

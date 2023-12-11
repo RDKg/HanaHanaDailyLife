@@ -52,3 +52,4 @@ export class LocalStorageHandler {
 LocalStorageHandler.saveStorageItemIfNotExists('isTaskStartNotificationsEnabled', 'true');
 LocalStorageHandler.saveStorageItemIfNotExists('isTaskEndNotificationsEnabled', 'true');
 LocalStorageHandler.saveStorageItemIfNotExists('username', 'Ваш профиль');
+LocalStorageHandler.saveStorageItemIfNotExists('avatar', '../../assets/img/default-avatar.jpg');

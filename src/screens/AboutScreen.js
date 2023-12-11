@@ -9,7 +9,7 @@ import { styles } from '../styles.js';
 import aboutJsonData from '../contents/about.json';
 
 export const AboutScreen = ({ navigation, route }) => {
-    const withGoBack = route?.params?.withGoBack;
+    const canNavigatePreviousPage = route?.params?.canNavigatePreviousPage;
 
     const [activeComponents, setActiveComponents] = useState([]);
 
@@ -34,7 +34,7 @@ export const AboutScreen = ({ navigation, route }) => {
         <View style={styles.mainContainer}>
             <components.BackgroundImage/>
             { 
-                withGoBack &&
+                canNavigatePreviousPage &&
                 <components.NavigatePreviousScreenButton onPress={() => navigation.goBack()}/>
             }
             <SafeAreaView style={{...styles.mainRestrictor}}> 

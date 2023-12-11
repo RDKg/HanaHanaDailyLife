@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, RefreshControl, TextInput, ImageBackground, ScrollView, TouchableHighlight, Text } from 'react-native';
+import { SafeAreaView, View, RefreshControl, TextInput, Image, ScrollView, TouchableHighlight, Text } from 'react-native';
 
 import * as constants from '../constants.js';
 import * as components from '../components.js';
@@ -7,16 +7,17 @@ import * as utils from '../utils.js';
 import { LocalStorageHandler } from '../data/localStorageHandler.js';
 import { DatabaseHandler } from '../data/dbHandler.js';
 import { styles } from '../styles.js';
-import { NotificationsService } from '../deviceFeatures.js';
+import { NotificationsService, MediaLibraryService } from '../deviceFeatures.js';
 
 const db = DatabaseHandler.openDb('HanaHanaDailyLife.db');
 const dbService = new DatabaseHandler(db);
 
 export const SettingsScreen = ({ navigation, route }) => {
-    const withGoBack = route?.params?.withGoBack;
+    const canNavigatePreviousPage = route?.params?.canNavigatePreviousPage;
     const currentDate = new Date();
 
     const [username, setUsername] = useState();
+    const [avatar, setAvatar] = useState();
     
     const [isTaskStartNotificationsEnabled, setIsTaskStartNotificationsEnabled] = useState();
     const [isTaskEndNotificationsEnabled, setIsTaskEndNotificationsEnabled] = useState();
@@ -28,12 +29,14 @@ export const SettingsScreen = ({ navigation, route }) => {
         const isStartEnabled = await LocalStorageHandler.getStorageItem('isTaskStartNotificationsEnabled');
         const isEndEnabled = await LocalStorageHandler.getStorageItem('isTaskEndNotificationsEnabled');
         const name = await LocalStorageHandler.getStorageItem('username');
+        const avatarPath = await LocalStorageHandler.getStorageItem('avatar');
 
-        return {
-            isStartEnabled,
-            isEndEnabled,
-            name
-        }
+        setIsTaskStartNotificationsEnabled(isStartEnabled != 'false');
+        setIsTaskEndNotificationsEnabled(isEndEnabled != 'false');
+        setUsername(name);
+        setAvatar(avatarPath);
+        setIsDataLoaded(true);
+        setIsRefreshing(false);
     }
 
     const fetchTasksNotificationsData = async () => {
@@ -64,6 +67,20 @@ export const SettingsScreen = ({ navigation, route }) => {
     const onRefresh = () => {
         setIsDataLoaded(false);
     };
+
+    const onUploadImage = async () => {
+        const uriImage = await MediaLibraryService.pickImage();
+
+        if (uriImage) {
+            utils.saveAvatar(uriImage)
+            .then(result => {
+                if (result) {
+                    LocalStorageHandler.saveStorageItem('avatar', result);
+                    onRefresh();
+                }
+            });
+        }
+    }
 
     useEffect(() => {
         if (isDataLoaded) {
@@ -110,21 +127,14 @@ export const SettingsScreen = ({ navigation, route }) => {
     }, [isChangeUsernameButtonPressed]);
 
     useEffect(() => {
-        fetchData()
-        .then(result => {
-            setIsTaskStartNotificationsEnabled(result.isStartEnabled != 'false');
-            setIsTaskEndNotificationsEnabled(result.isEndEnabled != 'false');
-            setUsername(result.name);
-            setIsDataLoaded(true);
-            setIsRefreshing(false);
-        });
+        fetchData();
     }, [isDataLoaded]);
 
     return (
         <View style={styles.mainContainer}>
             <components.BackgroundImage/>
             { 
-                withGoBack &&
+                canNavigatePreviousPage &&
                 <components.NavigatePreviousScreenButton onPress={() => navigation.goBack()}/>
             }
             <SafeAreaView style={{gap: constants.MARGIN, position: 'relative', flex: 1}}>   
@@ -167,21 +177,25 @@ export const SettingsScreen = ({ navigation, route }) => {
                                             overflow: 'hidden'
                                         }}
                                     >
-                                        <ImageBackground/>
+                                        <Image source={{uri: avatar}} style={{aspectRatio: 1}}/>
                                         <TouchableHighlight
-                                            onPress={() => {}}
+                                            onPress={() => {onUploadImage()}}
                                             underlayColor={utils.convertColorDataToString(constants.GRAY_COLOR)}
                                             style={{ 
-                                                backgroundColor: utils.convertColorDataToString(constants.BLACK_COLOR),
+                                                backgroundColor: utils.convertColorDataToString({...constants.BLACK_COLOR, a: 0.25}),
                                                 height: 50,
                                                 width: '100%',
                                                 position: 'absolute',
                                                 bottom: 0,
-                                                opacity: 0.2,
                                                 justifyContent: 'center',
                                             }}
                                         >
-                                            <Text style={styles.hintText}>ИЗМЕНИТЬ ФОТОГРАФИЮ</Text>
+                                            <Text 
+                                                style={{
+                                                    ...styles.hintText, 
+                                                    color: utils.convertColorDataToString(constants.WHITE_COLOR)
+                                                }}
+                                            >ИЗМЕНИТЬ ФОТОГРАФИЮ</Text>
                                         </TouchableHighlight>
                                     </View>
                                 </View>

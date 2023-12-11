@@ -1,4 +1,4 @@
-import { Platform, Alert, Linking  } from 'react-native';
+import { Platform, Alert, Linking } from 'react-native';
 
 import * as Notifications from 'expo-notifications';
 import * as ImagePicker from 'expo-image-picker';
@@ -94,7 +94,7 @@ export class NotificationsService {
 }
 
 export class LocationService {
-    static async isForegroundLocationPermissionGranted() {
+    static async registerForForegroundLocationPermission() {
         try {
             const foregroundResponse = await Location.requestForegroundPermissionsAsync();
     
@@ -107,7 +107,7 @@ export class LocationService {
         }
     }
     
-    static async isBackgroundLocationPermissionGranted() {
+    static async registerForBackgroundLocationPermission() {
         try {
             const backgroundResponse = await Location.requestBackgroundPermissionsAsync();
     
@@ -174,7 +174,7 @@ export class LocationService {
         };
     
         const checkForegroundPermission = async () => {
-            isForegroundGranted = await this.isForegroundLocationPermissionGranted();
+            isForegroundGranted = await this.registerForForegroundLocationPermission();
     
             if (!isForegroundGranted) {
                 showForegroundPermissionAlert();
@@ -185,7 +185,7 @@ export class LocationService {
         };
     
         const checkBackgroundPermission = async () => {
-            isBackgroundGranted = await this.isBackgroundLocationPermissionGranted();
+            isBackgroundGranted = await this.registerForBackgroundLocationPermission();
     
             if (!isBackgroundGranted) {
                 showBackgroundPermissionAlert();
@@ -234,6 +234,36 @@ export class LocationService {
     }
 }
 
-export class ImagePickerService {
+export class MediaLibraryService {
+    static async registerMediaLibraryPermissions() {
+        try {
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
+            return status !== 'granted';
+        }
+        catch (error) {
+            console.error(`Ошибка получения доступа к галерее!: ${error}`);
+
+            return false;
+        }
+    }
+
+    static async pickImage() {
+        try {
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                quality: 1
+            });
+    
+            if (!result.canceled) {
+                return result.assets[0].uri;
+            }
+
+            throw 'Отмена выбора фотографии!';
+        }
+        catch (error) {
+            console.error(`Ошибка получения фотографии из галереи: ${error}`);
+        }
+    }
 }
