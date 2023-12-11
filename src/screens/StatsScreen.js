@@ -28,7 +28,7 @@ export const StatsScreen = ({ navigation, route }) => {
     const [years, setYears] = useState([]);
     const [monthlyBudgets, setMonthlyBudgets] = useState();
     
-    const [selectedYear, setSelectedYear] = useState(years[years.length - 1]);
+    const [selectedYear, setSelectedYear] = useState();
     const [selectedMonth, setSelectedMonth] = useState();
 
     const [pricesDivider, setPricesDivider] = useState([0]);
@@ -52,7 +52,10 @@ export const StatsScreen = ({ navigation, route }) => {
                 FROM task;`,
                 [],
                 (_, {rows}) => {
-                    setYears(rows._array.map(item => item.year).sort().reverse());
+                    const yearsResult = rows._array.map(item => item.year).sort().reverse();
+
+                    setYears(yearsResult);
+                    setSelectedYear(yearsResult[0]);
                 },
                 (_, error) => {
                     console.error('Ошибка выполнения запроса для получения уникальных дат:', error);
@@ -120,6 +123,8 @@ export const StatsScreen = ({ navigation, route }) => {
 
     const onRefresh = () => {
         setIsDataLoaded(false);
+        setMonthlyBudgets([]);
+        setPricesDivider([0]);
         fetchYears();
         setIsRefreshing(false);
     };

@@ -8,8 +8,8 @@ import * as utils from '../utils.js';
 import { LocalStorageHandler } from '../data/localStorageHandler.js';
 import { DatabaseHandler } from '../data/dbHandler.js';
 import { styles } from '../styles.js';
-
-import { TaskDetailsScreen, TaskEditorScreen } from './TasksScreen.js';
+import { TaskEditorScreen } from './TaskEditorScreen.js';
+import { TaskDetailsScreen } from './TaskDetailsScreen.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -30,7 +30,7 @@ export const ProfileTabNavigator = ({ route }) => {
         >
             <Stack.Screen name='HomeProfile' component={ProfileScreen} initialParams={{canNavigatePreviousPage, isReload: true}}/>
             <Stack.Screen name='TaskEditor' component={TaskEditorScreen}/>
-            <Stack.Screen name='TaskDetails' component={TaskDetailsScreen}/>
+            <Stack.Screen name='TaskDetails' component={TaskDetailsScreen} initialParams={{canNavigatePreviousPage: true}}/>
         </Stack.Navigator>
     )
 }

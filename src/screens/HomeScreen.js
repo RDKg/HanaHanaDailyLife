@@ -14,6 +14,7 @@ import { TaskTabNavigator } from './TasksScreen.js';
 import { ProfileTabNavigator } from './ProfileScreen.js';
 import { SettingsScreen } from './SettingsScreen.js';
 import { StatsScreen } from './StatsScreen.js';
+import { DeveloperScreen } from './DeveloperScreen.js';
 
 import BackgroundProfileButton from '../../assets/img/background-profile-button.svg';
 import BackgroundSettingsButton from '../../assets/img/background-settings-button.svg';
@@ -38,6 +39,7 @@ export const HomeTabNavigator = () => {
             <Stack.Screen name='Tasks' component={TaskTabNavigator} initialParams={{canNavigatePreviousPage: true}}/>
             <Stack.Screen name='Stats' component={StatsScreen}/>
             <Stack.Screen name='About' component={AboutScreen}/>
+            <Stack.Screen name='Developer' component={DeveloperScreen}/>
         </Stack.Navigator>
     )
 }
@@ -169,8 +171,8 @@ export const HomeScreen = ({navigation}) => {
                             ...styles.defaultBox, 
                             ...styles.dropShadow, 
                             padding: constants.PADDING
-                        }
-                    }>
+                        }}
+                    >
                         <Text style={styles.defaultTextButton}>СТАТИСТИКА</Text>
                     </TouchableHighlight>
                     <TouchableHighlight 
@@ -183,6 +185,17 @@ export const HomeScreen = ({navigation}) => {
                         }
                     }>
                         <Text style={styles.defaultTextButton}>О ПРИЛОЖЕНИИ</Text>
+                    </TouchableHighlight>
+                    <TouchableHighlight 
+                        onPress={() => navigation.navigate('Developer', {canNavigatePreviousPage: true})} 
+                        underlayColor={utils.convertColorDataToString(constants.GRAY_COLOR)}
+                        style={{
+                            ...styles.defaultBox, 
+                            ...styles.dropShadow, 
+                            padding: constants.PADDING
+                        }
+                    }>
+                        <Text style={styles.defaultTextButton}>ДЛЯ РАЗРАБОТЧИКА</Text>
                     </TouchableHighlight>
                 </View>
             </SafeAreaView>
