@@ -5,7 +5,7 @@ import * as constants from '../constants.js';
 import * as components from '../components.js';
 import * as utils from '../utils.js';
 import { LocalStorageHandler } from '../data/localStorageHandler.js';
-import { DatabaseHandler } from '../data/dbHandler.js';
+import { DatabaseHandler } from '../data/databaseHandler.js';
 import { styles } from '../styles.js';
 import { NotificationsService, MediaLibraryService } from '../deviceFeatures.js';
 
@@ -40,7 +40,7 @@ export const SettingsScreen = ({ navigation, route }) => {
     }
 
     const fetchTasksNotificationsData = async () => {
-        const tasksData = await dbHandler.getTableData(
+        const tasksData = await dbHandler.getTableEntries(
             'task',
             [
                 {field: 'started_at', comparison: '>=', value: currentDate.getTime()},

@@ -6,7 +6,7 @@ import * as constants from '../constants.js';
 import * as components from '../components.js';
 import * as utils from '../utils.js';
 import { NotificationsService, LocationService } from '../deviceFeatures.js';
-import { DatabaseHandler } from '../data/dbHandler.js';
+import { DatabaseHandler } from '../data/databaseHandler.js';
 import { Task } from '../data/models.js'
 import { styles } from '../styles.js';
 
@@ -113,7 +113,7 @@ export const TaskEditorScreen = ({navigation, route}) => {
         setValidationErrors(taskValidation.errors);
 
         if (Object.keys(taskValidation.errors).length === 0) {
-            dbHandler.insertData('task', newTaskData)
+            dbHandler.insertEntry('task', newTaskData)
             .then(result => {
                 NotificationsService.scheduleStartTaskNotification({...newTaskData, id: result});
                 NotificationsService.scheduleEndTaskNotification({...newTaskData, id: result});
@@ -143,7 +143,7 @@ export const TaskEditorScreen = ({navigation, route}) => {
             navigation.navigate(prevScreenName);
         }
         else if (Object.keys(taskValidation.errors).length === 0) {
-            dbHandler.updateData('task', newTaskData);
+            dbHandler.updateEntry('task', newTaskData);
             NotificationsService.cancelScheduledTaskNotification(newTaskData.id);
             NotificationsService.scheduleStartTaskNotification(newTaskData);
             NotificationsService.scheduleEndTaskNotification(newTaskData);
@@ -159,7 +159,7 @@ export const TaskEditorScreen = ({navigation, route}) => {
                 {
                     text: 'ДА',
                     onPress: () => {
-                        dbHandler.deleteData('task', taskData.id);
+                        dbHandler.deleteEntries('task', taskData.id);
                         NotificationsService.cancelScheduledTaskNotification(taskData.id);
                         navigation.navigate(prevScreenName, {isReload: true});
                     },
@@ -239,8 +239,8 @@ export const TaskEditorScreen = ({navigation, route}) => {
     // Получаем категории и активности из БД
     useEffect(() => {
         Promise.all([
-            dbHandler.getTableData('category'),
-            dbHandler.getTableData('activity')
+            dbHandler.getTableEntries('category'),
+            dbHandler.getTableEntries('activity')
         ])
         .then(([categoryResult, activityResult]) => {
             const categories = categoryResult._array.map(item => ({

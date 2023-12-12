@@ -2,23 +2,145 @@ import React, { useState, useRef, useEffect } from 'react';
 import { SafeAreaView, Text, View, TouchableHighlight, ScrollView, RefreshControl } from 'react-native';
 import { Line, Svg } from 'react-native-svg';
 
+import { v4 as uuidv4 } from 'uuid'; 
+
 import * as constants from '../constants.js';
 import * as components from '../components.js';
 import * as utils from '../utils.js';
-import { DatabaseHandler } from '../data/dbHandler.js';
+import { DatabaseHandler } from '../data/databaseHandler.js';
 import { styles } from '../styles.js';
 
 const db = DatabaseHandler.openDb('HanaHanaDailyLife.db');
 const dbHandler = new DatabaseHandler(db);
 
+const monthLabels = [
+    'Январь', 'Февраль', 'Март', 
+    'Апрель', 'Май', 'Июнь', 
+    'Июль', 'Август', 'Сентябрь', 
+    'Октябрь', 'Ноябрь', 'Декабрь'
+];
+
 export const StatsScreen = ({ navigation, route }) => {
     const canNavigatePreviousPage = route?.params?.canNavigatePreviousPage;
-    const monthLabels = [
-        'Январь', 'Февраль', 'Март', 
-        'Апрель', 'Май', 'Июнь', 
-        'Июль', 'Август', 'Сентябрь', 
-        'Октябрь', 'Ноябрь', 'Декабрь'
-    ];
+
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const [isDataLoaded, setIsDataLoaded] = useState(false);
+
+    const [priceDividers] = useState([2, 4, 8, 16, 32]);
+
+    const onRefresh = () => {
+
+    };
+
+    return (
+        <View style={styles.mainContainer}>
+            <components.BackgroundImage/>
+            { 
+                canNavigatePreviousPage &&
+                <components.NavigatePreviousScreenButton onPress={() => navigation.goBack()}/>
+            }
+            <SafeAreaView style={{gap: constants.MARGIN, position: 'relative', flex: 1}}>   
+                <ScrollView
+                    style={{height: '100%'}}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={isRefreshing}
+                            onRefresh={onRefresh}
+                            colors={[utils.convertColorDataToString(constants.PINK_COLOR)]}
+                        />
+                    }
+                >
+                    <View style={{...styles.mainContainerDefault}}>
+                        <View 
+                            style={{
+                                ...styles.defaultBox, 
+                                ...styles.dropShadow, 
+                                padding: constants.PADDING,
+                                gap: constants.PADDING,
+                                flexDirection: 'row',
+                                position: 'relative',
+                                width: '100%', 
+                            }}
+                        >
+                            <View style={{gap: constants.MARGIN}}>
+                                <View>
+                                    <Text style={{...styles.defaultTextStats, fontSize: 6}}></Text>
+                                </View>
+                                <View 
+                                    style={{
+                                        paddingVertical: constants.MARGIN,
+                                        justifyContent: 'space-between',
+                                        gap: constants.MARGIN, 
+                                        flex: 1, 
+                                    }}
+                                >
+                                    {
+                                        priceDividers.map(item => (
+                                            <Text key={uuidv4()} style={{...styles.defaultTextStats, fontSize: 12}}>{item}</Text>
+                                        ))
+                                    }
+                                </View>
+                            </View>
+                            <View style={{gap: constants.MARGIN, flex: 1}}>
+                                <View 
+                                    style={{
+                                        gap: constants.MARGIN, 
+                                        paddingHorizontal: constants.MARGIN,
+                                        flexDirection: 'row', 
+                                        justifyContent: 'space-between',
+                                    }}
+                                >
+                                    {
+                                        monthLabels.map((item, index) => (
+                                            <Text key={uuidv4()} style={{...styles.defaultTextStats, fontSize: 6}}>{item.slice(0, 3).toUpperCase()}</Text>
+                                        ))
+                                    }
+                                </View>
+                                <View 
+                                    style={{
+                                        ...styles.defaultBox,
+                                        backgroundColor: utils.convertColorDataToString(constants.GRAY_COLOR),
+                                        position: 'relative',
+                                        overflow: 'hidden',
+                                        height: 250,
+                                        flex: 1,
+                                    }}
+                                >
+                                    <View 
+                                        style={{
+                                            paddingVertical: constants.MARGIN,
+                                            justifyContent: 'space-between', 
+                                            gap: constants.MARGIN, 
+                                            width: '100%',
+                                            height: '100%',
+                                            opacity: 0.25,
+                                            flex: 1,
+                                        }}
+                                    >
+                                        {
+                                            priceDividers.map((priceDivider, index) => (
+                                                <View key={uuidv4()}>
+                                                    <Text style={{...styles.defaultTextStats, fontSize: 12}}></Text>
+                                                    <View style={{}}>
+                                                        <components.CustomLine key={index} height={1}/> 
+                                                    </View>
+                                                </View>
+                                            ))
+                                        }
+                                    </View>
+                                </View>
+                            </View>
+                        </View>
+                    </View>
+                </ScrollView>
+            </SafeAreaView>
+        </View>
+    );
+}
+
+export const StatsScreenOld = ({ navigation, route }) => {
+    const canNavigatePreviousPage = route?.params?.canNavigatePreviousPage;
+
     const currentDate = new Date();
 
     const [isRefreshing, setIsRefreshing] = useState(false);

@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import * as constants from '../constants.js';
 import * as components from '../components.js';
 import * as utils from '../utils.js';
-import { DatabaseHandler } from '../data/dbHandler.js';
+import { DatabaseHandler } from '../data/databaseHandler.js';
 import { styles } from '../styles.js'; 
 
 const db = DatabaseHandler.openDb('HanaHanaDailyLife.db');
@@ -18,8 +18,7 @@ export const DeveloperScreen = ({navigation, route}) => {
     const [activities, setActivities] = useState();
 
     const clearTasksDataFromDb = () => {
-        dbHandler.dropTableData('task');
-        dbHandler.createAndInsertDefaultData();
+        dbHandler.clearTable('task');
     }
 
     const generateTaskData = () => {
@@ -43,19 +42,19 @@ export const DeveloperScreen = ({navigation, route}) => {
             created_at: datetime,
             started_at: datetime + utils.random(1, 5000, 0),
             ended_at: datetime + utils.random(5000, 25000, 0),
-            category_id: activity.category_id - 1,
-            activity_id: activity.id - 1
+            category_id: activity.category_id,
+            activity_id: activity.id
         }
     }
 
     const createRandomTasks = () => {
         const taskData = generateTaskData();
         
-        dbHandler.insertData('task', taskData);
+        dbHandler.insertEntry('task', taskData);
     }
 
     useEffect(() => {
-        dbHandler.getTableData('activity')
+        dbHandler.getTableEntries('activity')
         .then((activityResult) => {
             const activities = activityResult._array.map(item => {return {...item, id: item.id - 1}});
 

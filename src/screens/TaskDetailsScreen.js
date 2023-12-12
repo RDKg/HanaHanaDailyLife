@@ -6,7 +6,7 @@ import * as constants from '../constants.js';
 import * as components from '../components.js';
 import * as utils from '../utils.js';
 import { NotificationsService, LocationService } from '../deviceFeatures.js';
-import { DatabaseHandler } from '../data/dbHandler.js';
+import { DatabaseHandler } from '../data/databaseHandler.js';
 import { styles } from '../styles.js';
 
 const db = DatabaseHandler.openDb('HanaHanaDailyLife.db');
@@ -41,7 +41,7 @@ export const TaskDetailsScreen = ({navigation, route}) => {
                 {
                     text: 'ДА',
                     onPress: () => {
-                        dbHandler.deleteData('task', taskData.id);
+                        dbHandler.deleteEntries('task', taskData.id);
                         NotificationsService.cancelScheduledTaskNotification(taskData.id);
                         navigation.navigate(prevScreenName, {isReload: true});
                     },
@@ -63,7 +63,7 @@ export const TaskDetailsScreen = ({navigation, route}) => {
                     {
                         text: 'ДА',
                         onPress: () => {
-                            dbHandler.updateData('task', {id: taskData.id, ended_at: currentDate.getTime()});
+                            dbHandler.updateEntry('task', {id: taskData.id, ended_at: currentDate.getTime()});
                             NotificationsService.cancelScheduledTaskNotification(taskData.id);
                             navigation.navigate(prevScreenName, {isReload: true});
                         },
@@ -134,8 +134,8 @@ export const TaskDetailsScreen = ({navigation, route}) => {
     // Получаем категории и активности из БД
     useEffect(() => {
         Promise.all([
-            dbHandler.getTableData('category'),
-            dbHandler.getTableData('activity')
+            dbHandler.getTableEntries('category'),
+            dbHandler.getTableEntries('activity')
         ])
         .then(([categoryResult, activityResult]) => {
             const categories = categoryResult._array.map(item => {return {...item, id: item.id - 1}});

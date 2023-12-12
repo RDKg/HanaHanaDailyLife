@@ -10,7 +10,7 @@ import * as components from './src/components.js';
 import * as constants from './src/constants.js';
 import * as utils from './src/utils.js';
 import { NotificationsService } from './src/deviceFeatures.js';
-import { DatabaseHandler, DatabaseService } from './src/data/dbHandler.js';
+import { DatabaseService } from './src/data/databaseService.js';
 
 import { TaskTabNavigator } from './src/screens/TasksScreen.js';
 import { SettingsScreen } from './src/screens/SettingsScreen.js';
@@ -18,14 +18,14 @@ import { ProfileTabNavigator } from './src/screens/ProfileScreen.js';
 import { StatsScreen } from './src/screens/StatsScreen.js';
 import { HomeTabNavigator } from './src/screens/HomeScreen.js'
 
+const db = DatabaseService.openDb('HanaHanaDailyLife.db');
+const dbService = new DatabaseService(db);
+dbService.initializeDatabase();
+
 const Tab = createBottomTabNavigator();
 
 NotificationsService.registerForPushNotifications(); 
 SplashScreen.preventAutoHideAsync();
-
-const db = DatabaseHandler.openDb('HanaHanaDailyLife.db');
-const dbService = new DatabaseService(db);
-dbService.initializeDatabase();
 
 export default function App() {
     const [fontsLoaded] = Font.useFonts(constants.FONT_FILES);
@@ -35,7 +35,7 @@ export default function App() {
             await SplashScreen.hideAsync(); 
         }
     }, [fontsLoaded]);
-    
+
     if (!fontsLoaded) {
         return null; 
     }

@@ -6,7 +6,7 @@ import * as constants from '../constants.js';
 import * as components from '../components.js';
 import * as utils from '../utils.js';
 import { LocalStorageHandler } from '../data/localStorageHandler.js';
-import { DatabaseHandler } from '../data/dbHandler.js';
+import { DatabaseHandler } from '../data/databaseHandler.js';
 import { styles } from '../styles.js';
 import { TaskEditorScreen } from './TaskEditorScreen.js';
 import { TaskDetailsScreen } from './TaskDetailsScreen.js';
@@ -63,9 +63,9 @@ export const ProfileScreen = ({ navigation, route }) => {
         const tasks = [];
         
         Promise.all([
-            dbHandler.getTableData('category'),
-            dbHandler.getTableData('activity'),
-            dbHandler.getTableData(
+            dbHandler.getTableEntries('category'),
+            dbHandler.getTableEntries('activity'),
+            dbHandler.getTableEntries(
                 'task', 
                 {orderBy: 'started_at', typeOrder: 'ASC'},
                 [
