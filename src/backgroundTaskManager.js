@@ -7,7 +7,7 @@ export class BackgroundTaskManager {
             TaskManager.defineTask(taskName, async () => taskExecutor);
         }
         catch (error) {
-            console.error(`Ошибка определения фоновой задачи: ${error}`);
+            console.error(`Background task define error: ${error}`);
         }
     }
 
@@ -22,7 +22,7 @@ export class BackgroundTaskManager {
     ) {
 
         if (!await TaskManager.isTaskRegisteredAsync(taskName)) {
-            console.error('Задача не может быть создана, т.к. еще не определена!');
+            console.error('The task cannot be created because it has not been defined yet!');
 
             return;
         } 
@@ -36,7 +36,7 @@ export class BackgroundTaskManager {
             });
         }
         catch (error) {
-            console.error(`Ошибка создания фоновой задачи: ${error}`);
+            console.error(`Error creating a background task: ${error}`);
         }
     }
 
@@ -45,7 +45,7 @@ export class BackgroundTaskManager {
             return BackgroundFetch.unregisterTaskAsync(taskName);
         }
         catch (error) {
-            console.error(`Ошибка отмены фоновой задачи: ${error}`);
+            console.error(`Background task cancellation error: ${error}`);
         }
     }
 }

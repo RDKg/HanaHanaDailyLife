@@ -34,7 +34,7 @@ export class NotificationsService {
             return token;
         }
         catch (error) {
-            console.error('Пользователь не разрешил Push-уведомления!');
+            console.error(`The user didn't allow Push notifications!: ${error}`);
         }
     }
 
@@ -101,7 +101,7 @@ export class LocationService {
             return foregroundResponse.status === 'granted';
         }
         catch (error) {
-            console.error('Ошибка получения разрешения на использование геолокации: ', error);
+            console.error(`Error in obtaining permission to use geolocation: ${error}`);
     
             return false;
         }
@@ -114,7 +114,7 @@ export class LocationService {
             return backgroundResponse.status === 'granted';
         }
         catch (error) {
-            console.error('Ошибка получения разрешения на использование геолокации на фоне: ', error);
+            console.error(`Error in obtaining permission to use geolocation in the background: ${error}`);
     
             return false
         }
@@ -127,7 +127,7 @@ export class LocationService {
             return status.gpsAvailable;
         }
         catch (error) {
-            console.error('Не удалось проверить включена ли геолокация: ', error);
+            console.error(`Couldn't check if geolocation is enabled: ${error}`);
     
             return false;
         }
@@ -151,7 +151,7 @@ export class LocationService {
             };
         }
         catch (error) {
-            console.error(`Ошибка получения текущей геолокации: ${error}`);
+            console.error(`Error getting the current geolocation: ${error}`);
     
             return null;
         }
@@ -242,7 +242,7 @@ export class MediaLibraryService {
             return status !== 'granted';
         }
         catch (error) {
-            console.error(`Ошибка получения доступа к галерее!: ${error}`);
+            console.error(`Error accessing the gallery: ${error}`);
 
             return false;
         }
@@ -263,7 +263,7 @@ export class MediaLibraryService {
             throw 'Отмена выбора фотографии!';
         }
         catch (error) {
-            console.error(`Ошибка получения фотографии из галереи: ${error}`);
+            console.error(`Error getting a photo from the gallery: ${error}`);
         }
     }
 }

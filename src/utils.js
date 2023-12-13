@@ -191,7 +191,7 @@ export const saveAvatar = async (path) => {
         throw match;
     }
     catch (error) {
-        console.error(`Ошибка сохранения изображения: ${error}`);
+        console.error(`Error saving the image: ${error}`);
     }
 }
 

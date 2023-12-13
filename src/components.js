@@ -464,16 +464,15 @@ export const CustomDateTimePicker = ({
 }
 
 export const CustomLine = ({
-    height,
-    width,
+    style,
+    width='100%',
+    height=1,
     strokeWidth=1,
-    color=utils.convertColorDataToString(constants.BLACK_COLOR)
+    color=utils.convertColorDataToString(constants.BLACK_COLOR),
 }) => {
     return (
-        <View style={{height: height, width: width}}>
-            <Svg style={{height: height, width: width}}>
-                <Line x1='0' y1='0' x2='100%' y2='0' stroke={color} strokeWidth={strokeWidth}/>
-            </Svg>
-        </View>
+        <Svg style={{height: height, width: width, ...style}}>
+            <Line x1='0' y1='0' x2='100%' y2='0' stroke={color} strokeWidth={strokeWidth}/>
+        </Svg>
     );
 }

@@ -8,7 +8,7 @@ export class LocalStorageHandler {
             return value;
         }
         catch (error) {
-            console.error(`Ошибка получения данных из локального хранилища: ${error}`);
+            console.error(`Error retrieving data from local storage: ${error}`);
         }
     
         return null;
@@ -21,7 +21,7 @@ export class LocalStorageHandler {
             return true;
         }
         catch (error) {
-            console.error(`Ошибка удаления данных из локального хранилища: ${error}`);
+            console.error(`Error deleting data from local storage: ${error}`);
         }
     
         return false;
@@ -34,7 +34,7 @@ export class LocalStorageHandler {
             return true;
         }
         catch (error) {
-            console.error(`Ошибка сохранения данных в локальное хранилище: ${error}`);
+            console.error(`Error saving data to local storage: ${error}`);
         }
     
         return false;

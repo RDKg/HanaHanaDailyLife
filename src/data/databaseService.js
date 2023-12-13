@@ -22,7 +22,7 @@ export class DatabaseService extends DatabaseHandler {
                 tx.executeSql(
                     `CREATE TABLE IF NOT EXISTS category (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        title TEXT UNQIUE, 
+                        title TEXT UNIQUE, 
                         avatar TEXT
                     );`,
                     [],
@@ -139,6 +139,73 @@ export class DatabaseService extends DatabaseHandler {
             if (!isTaskCreated) {
                 this.createTask();
             }
+        })
+        .catch((error) => console.error(`Database initialization error: ${error}`));
+    }
+
+    async getExistingYears() {
+        return new Promise((resolve, reject) => {
+            this.db.transaction(tx => {
+                tx.executeSql(
+                    `SELECT 
+                        DISTINCT strftime('%Y', datetime(started_at / 1000, 'unixepoch')) AS year
+                    FROM task;`,
+                    [],
+                    (_, {rows}) => {
+                        const result = rows._array.map(item => item.year).sort().reverse();
+    
+                        resolve(result);
+                    },
+                    (_, error) => {
+                        reject(`Error executing the request to get the existing years: ${error}`);
+                    }
+                );
+            });
+        });
+    }
+
+    async getMonthlyBudgetsOfYear(year) {
+        return new Promise((resolve, reject) => {
+            this.db.transaction(tx => {
+                tx.executeSql(
+                    `SELECT 
+                        CAST(strftime('%m', datetime(started_at / 1000, 'unixepoch')) AS INTEGER) AS month,
+                        strftime('%Y', datetime(started_at / 1000, 'unixepoch')) AS year,
+                        SUM(budget) AS total_budget
+                    FROM task
+                    WHERE strftime('%Y', datetime(started_at / 1000, 'unixepoch')) = ?
+                    GROUP BY month
+                    ORDER BY month;`,
+                    [year], 
+                    (_, {rows}) => {
+                        const budgets = rows._array;
+
+                        resolve(budgets);
+                    },
+                    (_, error) => {
+                        reject(`Error executing the request to get monthly budgets of year: ${error}`);
+                    }
+                );
+            });
+        });
+    }
+
+    async getTasksOfMonthAndYear(year, month) {
+        return new Promise((resolve, reject) => {
+            this.db.transaction(tx => {
+                tx.executeSql(
+                    `SELECT * FROM task
+                    WHERE strftime('%Y', datetime(started_at / 1000, 'unixepoch')) = ?
+                    AND CAST(strftime('%m', datetime(started_at / 1000, 'unixepoch')) AS INTEGER) = ?;`,
+                    [year, month],   
+                    (_, {rows}) => {
+                        resolve(rows._array);
+                    },
+                    (_, error) => {
+                        reject(`Error executing the request to receive data for the month: ${error}`);
+                    }
+                );
+            });
         });
     }
 }

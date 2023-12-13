@@ -7,11 +7,11 @@ import { v4 as uuidv4 } from 'uuid';
 import * as constants from '../constants.js';
 import * as components from '../components.js';
 import * as utils from '../utils.js';
-import { DatabaseHandler } from '../data/databaseHandler.js';
+import { DatabaseService } from '../data/databaseService.js';
 import { styles } from '../styles.js';
 
-const db = DatabaseHandler.openDb('HanaHanaDailyLife.db');
-const dbHandler = new DatabaseHandler(db);
+const db = DatabaseService.openDb('HanaHanaDailyLife.db');
+const dbService = new DatabaseService(db);
 
 const monthLabels = [
     'Январь', 'Февраль', 'Март', 
@@ -22,16 +22,95 @@ const monthLabels = [
 
 export const StatsScreen = ({ navigation, route }) => {
     const canNavigatePreviousPage = route?.params?.canNavigatePreviousPage;
+    const currentDate = new Date();
+
+    const [priceDividerHeight, setPriceDividerHeight] = useState();
 
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [isDataLoaded, setIsDataLoaded] = useState(false);
 
-    const [priceDividers] = useState([2, 4, 8, 16, 32]);
+    const [tasks, setTasks] = useState();
+
+    const [priceDividers, setPriceDividers] = useState([0, 0, 0, 0, 0]);
+    const [existingYears, setExistingYears] = useState([]);
+    const [monthlyBudgetsOfYear, setMonthlyBudgetsOfYear] = useState();
+    
+    const [selectedYear, setSelectedYear] = useState();
+    const [selectedMonth, setSelectedMonth] = useState();
 
     const onRefresh = () => {
-
+        setIsRefreshing(true);
+        setIsDataLoaded(false);
     };
 
+    const fetchExistingYears = () => {
+        dbService.getExistingYears()
+        .then(result => {
+            setExistingYears(result);
+            setSelectedYear(result[0]);
+        });
+    }
+
+    const fetchMonthlyBudgetsOfYear = () => {
+        dbService.getMonthlyBudgetsOfYear(selectedYear)
+        .then(result => {
+            const prices = [0];
+            let maxPrice = 0;
+
+            result.map(item => {
+                if (maxPrice < item.total_budget) {
+                    maxPrice = item.total_budget;
+                }
+            })
+
+            for (let i = 1; i <= 5; i++) {
+                prices.push(Math.round(maxPrice / i) / 1000);
+            } 
+
+            setPriceDividers(prices.sort());
+            setSelectedMonth(result[result.length-1]?.month);
+            setMonthlyBudgetsOfYear(result);
+        });
+    }
+
+    const fetchTasksOfMonthAndYear = () => {
+        dbService.getTasksOfMonthAndYear(selectedYear, selectedMonth)
+        .then(result => {
+            setTasks(result);
+        })
+        
+    }
+
+    const handleLayoutPriceDividerHeight = (event) => {
+        if (priceDividerHeight == null) {
+            setPriceDividerHeight(event.nativeEvent.layout.height);
+        }
+    };
+
+    useEffect(() => {
+        if (!isDataLoaded) {
+            fetchExistingYears();
+        }
+
+        setIsDataLoaded(true);
+        setIsRefreshing(false);
+    }, [isDataLoaded]);
+
+    useEffect(() => {
+        if (selectedYear) {
+            fetchMonthlyBudgetsOfYear();
+        }
+        else {
+            setMonthlyBudgetsOfYear(null);
+        }
+    }, [selectedYear, existingYears]);
+
+    useEffect(() => {
+        if (selectedMonth) {
+            fetchTasksOfMonthAndYear();
+        }
+    }, [selectedMonth]);
+    
     return (
         <View style={styles.mainContainer}>
             <components.BackgroundImage/>
@@ -57,78 +136,183 @@ export const StatsScreen = ({ navigation, route }) => {
                                 ...styles.dropShadow, 
                                 padding: constants.PADDING,
                                 gap: constants.PADDING,
-                                flexDirection: 'row',
-                                position: 'relative',
-                                width: '100%', 
                             }}
                         >
-                            <View style={{gap: constants.MARGIN}}>
-                                <View>
+                            <View
+                                style={{
+                                    gap: constants.PADDING,
+                                    flexDirection: 'row',
+                                    position: 'relative',
+                                }}
+                            >
+                                <View style={{gap: constants.MARGIN}}>
                                     <Text style={{...styles.defaultTextStats, fontSize: 6}}></Text>
-                                </View>
-                                <View 
-                                    style={{
-                                        paddingVertical: constants.MARGIN,
-                                        justifyContent: 'space-between',
-                                        gap: constants.MARGIN, 
-                                        flex: 1, 
-                                    }}
-                                >
-                                    {
-                                        priceDividers.map(item => (
-                                            <Text key={uuidv4()} style={{...styles.defaultTextStats, fontSize: 12}}>{item}</Text>
-                                        ))
-                                    }
-                                </View>
-                            </View>
-                            <View style={{gap: constants.MARGIN, flex: 1}}>
-                                <View 
-                                    style={{
-                                        gap: constants.MARGIN, 
-                                        paddingHorizontal: constants.MARGIN,
-                                        flexDirection: 'row', 
-                                        justifyContent: 'space-between',
-                                    }}
-                                >
-                                    {
-                                        monthLabels.map((item, index) => (
-                                            <Text key={uuidv4()} style={{...styles.defaultTextStats, fontSize: 6}}>{item.slice(0, 3).toUpperCase()}</Text>
-                                        ))
-                                    }
-                                </View>
-                                <View 
-                                    style={{
-                                        ...styles.defaultBox,
-                                        backgroundColor: utils.convertColorDataToString(constants.GRAY_COLOR),
-                                        position: 'relative',
-                                        overflow: 'hidden',
-                                        height: 250,
-                                        flex: 1,
-                                    }}
-                                >
                                     <View 
                                         style={{
                                             paddingVertical: constants.MARGIN,
-                                            justifyContent: 'space-between', 
+                                            justifyContent: 'space-between',
                                             gap: constants.MARGIN, 
-                                            width: '100%',
-                                            height: '100%',
-                                            opacity: 0.25,
-                                            flex: 1,
+                                            flex: 1, 
                                         }}
                                     >
                                         {
-                                            priceDividers.map((priceDivider, index) => (
-                                                <View key={uuidv4()}>
-                                                    <Text style={{...styles.defaultTextStats, fontSize: 12}}></Text>
-                                                    <View style={{}}>
-                                                        <components.CustomLine key={index} height={1}/> 
-                                                    </View>
-                                                </View>
+                                            priceDividers.map(item => (
+                                                <Text 
+                                                    key={uuidv4()} 
+                                                    onLayout={(event) => handleLayoutPriceDividerHeight(event)}
+                                                    style={{
+                                                        ...styles.defaultTextStats, 
+                                                        fontSize: 10, 
+                                                        textAlign: 'center',
+                                                    }}
+                                                >{item}К</Text>
                                             ))
                                         }
                                     </View>
                                 </View>
+                                <View style={{gap: constants.MARGIN, flex: 1}}>
+                                    <View 
+                                        style={{
+                                            paddingHorizontal: constants.MARGIN,
+                                            justifyContent: 'space-between',
+                                            flexDirection: 'row', 
+                                        }}
+                                    >
+                                        {
+                                            monthLabels.map((item, index) => (
+                                                <Text 
+                                                    key={uuidv4()} 
+                                                    style={{...styles.defaultTextStats, fontSize: 6, width: 16, textAlign: 'center'}}
+                                                >{item.slice(0, 3).toUpperCase()}</Text>
+                                            ))
+                                        }
+                                    </View>
+                                    <View 
+                                        style={{
+                                            ...styles.defaultBox,
+                                            backgroundColor: utils.convertColorDataToString(constants.GRAY_COLOR),
+                                            position: 'relative',
+                                            overflow: 'hidden',
+                                            height: 250,
+                                            flex: 1,
+                                        }}
+                                    >
+                                        <View 
+                                            style={{
+                                                paddingVertical: constants.MARGIN,
+                                                justifyContent: 'space-between', 
+                                                gap: constants.MARGIN, 
+                                                width: '100%',
+                                                height: '100%',
+                                                opacity: 0.25,
+                                                flex: 1,
+                                            }}
+                                        >
+                                            {
+                                                priceDividers.map((priceDivider, index) => (
+                                                    <View key={uuidv4()} style={{height: priceDividerHeight, justifyContent: 'center'}}>
+                                                        <components.CustomLine key={index} height={1}/>
+                                                    </View>
+                                                ))
+                                            }
+                                        </View>
+                                        {
+                                            monthlyBudgetsOfYear &&
+                                            <View
+                                                style={{
+                                                    paddingHorizontal: constants.MARGIN,
+                                                    justifyContent: 'space-between',
+                                                    flexDirection: 'row',
+                                                    position: 'absolute',
+                                                    width: '100%',
+                                                    height: '100%',
+                                                }}
+                                            >
+                                                {
+                                                    monthLabels.map((item, index) => {
+                                                        const isExist = monthlyBudgetsOfYear.find(month => month.month - 1 == index);
+
+                                                        if (!isExist) {
+                                                            return <View style={{width: 16}}/>
+                                                        }
+
+                                                        const isSelected = selectedMonth - 1 == index;
+                                                        
+
+                                                        return (
+                                                            <TouchableHighlight
+                                                                key={uuidv4()}
+                                                                onPress={() => setSelectedMonth(index+1)}
+                                                                underlayColor={utils.convertColorDataToString(constants.PINK_COLOR)}
+                                                                style={{
+                                                                    width: 16,
+                                                                    minHeight: 10,
+                                                                    height: 10,
+                                                                    backgroundColor: isSelected ?
+                                                                                    utils.convertColorDataToString(constants.PINK_COLOR) :
+                                                                                    utils.convertColorDataToString(constants.PURPLE_COLOR)
+
+                                                                }}
+                                                            >
+                                                                <></>
+                                                            </TouchableHighlight> 
+                                                        );
+                                                    })
+                                                    
+                                                }
+                                            </View>
+                                        }
+                                    </View>
+                                </View>
+                            </View>
+                            <View style={{width: '100%', gap: constants.PADDING}}>
+                                {
+                                    existingYears.length ?
+                                    <>
+                                        <ScrollView
+                                            horizontal={true}
+                                            showsHorizontalScrollIndicator={false}
+                                            contentContainerStyle={{ 
+                                                flexDirection: 'row',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
+                                            }}
+                                        >
+                                            {
+                                                existingYears.map(year => (
+                                                    <TouchableHighlight
+                                                        key={uuidv4()}
+                                                        onPress={() => setSelectedYear(year)}
+                                                        underlayColor={null}
+                                                        style={{paddingHorizontal: constants.PADDING * 1.5}}
+                                                    >
+                                                        <Text 
+                                                            style={{
+                                                                ...styles.defaultTextStats,
+                                                                color: year === selectedYear && utils.convertColorDataToString(constants.PURPLE_COLOR),
+                                                                fontFamily: year === selectedYear ? 'RalewayRegular' : styles.defaultTextStats.fontFamily,
+                                                            }}
+                                                        >{year}</Text>
+                                                    </TouchableHighlight>
+                                                ))
+                                            }
+                                        </ScrollView> 
+                                        <View>
+                                            <components.CustomLine/>
+                                        </View>
+                                        {
+                                            tasks && 
+                                            <>
+                                                <Text style={{...styles.boxTitleText, textAlign: 'center'}} >{monthLabels[selectedMonth-1]} {selectedYear} г.</Text>
+                                                <Text style={styles.defaultTextStats}>Количество планов: {tasks.length}</Text>
+                                                <Text 
+                                                    style={styles.defaultTextStats}
+                                                >Потрачено: {monthlyBudgetsOfYear.find(item => item.month == selectedMonth)?.total_budget} руб.</Text>
+                                            </>
+                                        }
+                                    </> :
+                                    <Text style={{...styles.defaultTextStats}}>Данные отсутствуют</Text>
+                                }
                             </View>
                         </View>
                     </View>
@@ -399,7 +583,7 @@ export const StatsScreenOld = ({ navigation, route }) => {
                                         >
                                             {
                                                 pricesDivider.map((priceDivider, index) => (
-                                                    <components.CustomLine key={index} height={1}/>
+                                                    <components.CustomLine key={index}/>
                                                 ))
                                             }
                                         </View>
@@ -428,8 +612,8 @@ export const StatsScreenOld = ({ navigation, route }) => {
                                         >
                                             {
                                                 years.map((year, index) => (
-                                                    <TouchableHighlight
-                                                        key={index}
+                                                    <TouchableHighlight 
+                                                        key={uuidv4()}
                                                         onPress={() => setSelectedYear(year)}
                                                         underlayColor={null}
                                                     >
