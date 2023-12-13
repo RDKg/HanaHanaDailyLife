@@ -169,7 +169,7 @@ export const TasksScreen = ({navigation, route}) => {
                 <ScrollView
                     style={{height: '100%'}}
                     scrollEventThrottle={250}
-                    onScroll={handleScroll}
+                    onMomentumScrollEnd={handleScroll}
                     refreshControl={
                         <RefreshControl
                             refreshing={isRefreshing}

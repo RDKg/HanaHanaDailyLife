@@ -31,7 +31,7 @@ export const DeveloperScreen = ({navigation, route}) => {
         return {
             title: uuidv4(),
             description: uuidv4(), 
-            budget: utils.random(0, 1, 0) ? utils.random(0, 5000, 0) : 0,
+            budget: utils.random(0, 1, 0) ? utils.random(0, 25000, 0) : 0,
             route: null,
             is_route_following: null,
             is_map_enabled: isMapEnabled,
