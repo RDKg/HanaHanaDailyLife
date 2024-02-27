@@ -3,5 +3,7 @@
 
 Мобильное приложение для курсового проекта, разработанное студентом 4-го курса.
 
-https://github.com/RDKg/HanaHana-Daily-Life---React-Native-Mobile-App/assets/115119289/49d377c1-8daf-4cbf-8f38-426fea6d9d06
+https://github.com/RDKg/HanaHanaDailyLife/assets/115119289/aa264b99-9b7e-4c6a-af59-c18bebc7971c
+
+
 
